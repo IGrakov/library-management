@@ -10,7 +10,6 @@ from book.models import Book
 from user import factories
 
 CREATE_BOOK_URL = reverse('book:create_book')
-# RETRIEVE_UPDATE_DELETE_BOOK_URL = reverse('book:manage_book')
 LIST_BOOK_URL = reverse('book:list_book')
 
 
