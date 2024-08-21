@@ -178,11 +178,19 @@ class PrivateBookApiTests(TestCase):
         self.assertEqual(len(res.json().get('results')), 1)
 
     def test_list_books_filtered_success(self):
-        """Test listing paginated books with an authenticated user"""
-        BookFactory.create(language='En')
-        BookFactory.create(language='De')
-        BookFactory.create(language='Fr')
+        """Test listing filtered books by author, published_date and language with an authenticated user"""
+        BookFactory.create(author='foo', published_date='1980-01-01', language='En')
+        BookFactory.create(author='bar', published_date='1990-01-01', language='De')
+        BookFactory.create(author='baz', published_date='2000-01-01', language='Fr')
         res = self.client.get(LIST_BOOK_URL, {'language': 'Fr'})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.json().get('results')), 1)
         self.assertEqual(res.json().get('results')[0].get('language'), 'Fr')
+        res = self.client.get(LIST_BOOK_URL, {'author': 'foo'})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.json().get('results')), 1)
+        self.assertEqual(res.json().get('results')[0].get('author'), 'foo')
+        res = self.client.get(LIST_BOOK_URL, {'published_date': '1990-01-01'})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.json().get('results')), 1)
+        self.assertEqual(res.json().get('results')[0].get('published_date'), '1990-01-01')

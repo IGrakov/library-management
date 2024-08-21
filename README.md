@@ -26,3 +26,8 @@ PASSWORD: 'postgres'
 
 8. To run tests:
 ``poetry run python manage.py test``
+
+8. To run a specific test:
+``poetry run python manage.py test <path_to_specific_test>``
+e.g.:
+``poetry run python manage.py test book.tests.tests.PrivateBookApiTests.test_list_books_filtered_success``
