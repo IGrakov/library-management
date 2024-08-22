@@ -1,5 +1,6 @@
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema_view, extend_schema
 
 from book.models import Book
 from book.pagination import ResultSetPagination
@@ -12,6 +13,20 @@ class CreateBookView(generics.CreateAPIView):
     queryset = Book.objects.all()
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description='Retrieve book by id',
+    ),
+    put=extend_schema(
+        description='Update book by id',
+    ),
+    patch=extend_schema(
+        description='Partially update book by id',
+    ),
+    delete=extend_schema(
+        description='Delete book by id',
+    )
+)
 class RetrieveUpdateDeleteBookView(
     generics.RetrieveAPIView,
     generics.UpdateAPIView,
