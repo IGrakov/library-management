@@ -8,3 +8,9 @@ class Language(TimeStampMixin):
     name = models.CharField(max_length=255)
     two_letter_code = models.CharField(max_length=2)
     three_letter_code = models.CharField(max_length=3)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Language'
