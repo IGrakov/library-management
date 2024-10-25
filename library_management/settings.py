@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django_filters',
     'drf_spectacular',
     'core',
+    'reference_values',
     'user',
     'book',
 ]
