@@ -11,7 +11,7 @@ class Author(TimeStampMixin):
     middle_name = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
-        return ",".join([self.last_name, " ".join([self.first_name, self.middle_name])])
+        return ", ".join(filter(None, [self.last_name, " ".join(filter(None, [self.first_name, self.middle_name]))]))
 
     class Meta:
         verbose_name = 'Author'
