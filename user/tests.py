@@ -4,6 +4,9 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from user import constants
+from user.factories import UserFactory
+
 CREATE_USER_URL = reverse('user:create')
 TOKEN_URL = reverse('user:token')
 ME_URL = reverse('user:me')
@@ -13,8 +16,22 @@ TEST_LAST_NAME = 'Test last name'
 TEST_EMAIL = 'test@test.com'
 
 
-def create_user(**params):
-    return get_user_model().objects.create_user(**params)
+class UserRoleByDefaultTests(TestCase):
+    """Test assignment of user roles by default"""
+
+    def test_user_is_assigned__at_creation_to_reader_group_by_default(self):
+        payload = {
+            'email': TEST_EMAIL,
+            'password': 'testpassword',
+            'first_name': TEST_FIRST_NAME,
+            'last_name': TEST_LAST_NAME,
+        }
+        user = get_user_model().objects.create_user(**payload)
+        self.assertTrue(user.groups.filter(name=constants.Roles.READER).exists())
+
+    def test_superuser_is_assigned__at_creation_to_admin_group_by_default(self):
+        superuser = get_user_model().objects.create_superuser(email=TEST_EMAIL, password='testpassword')
+        self.assertTrue(superuser.groups.filter(name=constants.Roles.ADMIN).exists())
 
 
 class PublicUserApiTests(TestCase):
@@ -43,7 +60,7 @@ class PublicUserApiTests(TestCase):
             'first_name': TEST_FIRST_NAME,
             'last_name': TEST_LAST_NAME,
         }
-        create_user(**payload)
+        UserFactory(**payload)
 
         res = self.client.post(CREATE_USER_URL, payload)
 
@@ -66,7 +83,7 @@ class PublicUserApiTests(TestCase):
             'email': TEST_EMAIL,
             'password': 'test-user-pass123',
         }
-        create_user(**user_details)
+        UserFactory(**user_details)
 
         payload = {'email': user_details['email'], 'password': user_details['password']}
         res = self.client.post(TOKEN_URL, payload)
@@ -76,7 +93,7 @@ class PublicUserApiTests(TestCase):
 
     def test_create_token_invalid_creds(self):
         """Test that token is not create if invalid creds are given"""
-        create_user(email=TEST_EMAIL, password='validpass')
+        UserFactory(email=TEST_EMAIL, password='validpass')
         payload = {
             'email': TEST_EMAIL,
             'password': 'invalidpass',
@@ -119,7 +136,7 @@ class PrivateUserApiTest(TestCase):
     """Test API requests that require authentication"""
 
     def setUp(self) -> None:
-        self.user = create_user(
+        self.user = UserFactory(
             email=TEST_EMAIL, password='testpass', first_name=TEST_FIRST_NAME, last_name=TEST_LAST_NAME
         )
         self.client = APIClient()
