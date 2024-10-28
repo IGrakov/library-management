@@ -12,7 +12,7 @@ class Author(TimeStampMixin):
     middle_name = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
-        return ", ".join(filter(None, [self.last_name, " ".join(filter(None, [self.first_name, self.middle_name]))]))
+        return ', '.join(filter(None, [self.last_name, ' '.join(filter(None, [self.first_name, self.middle_name]))]))
 
     class Meta:
         verbose_name = 'Author'
@@ -30,7 +30,18 @@ class Book(TimeStampMixin):
     language = models.ManyToManyField(Language)
 
     def __str__(self):
-        return f"{self.title} - by {self.author} - ISBN: {self.isbn} - in {self.language}"
+        author_lst = []
+        for author in self.author.all():
+            # join first_name and middle_name only if they are not none
+            author_lst.append(' '.join(filter(None, [author.last_name, author.first_name, author.middle_name])))
+        authors = ', '.join(author_lst)
+
+        language_lst = []
+        for language in self.language.all():
+            language_lst.append(f'{language.two_letter_code}')
+        languages = ', '.join(language_lst)
+
+        return f'{self.title} - by {authors} - ISBN: {self.isbn} - in {languages}'
 
     class Meta:
         verbose_name = 'Book'
