@@ -52,10 +52,10 @@ class UserAdmin(UserAdmin):
         'group',
     )
     list_filter = (
-        'last_name',
         'email',
+        'last_name',
     )
     ordering = (
-        'last_name',
         'email',
+        'last_name',
     )
