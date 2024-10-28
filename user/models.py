@@ -1,10 +1,10 @@
-from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     Group,
     PermissionsMixin,
 )
+from django.db import models
 
 from core.models import TimeStampMixin
 from user import constants
@@ -40,6 +40,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
     """Custom user model that supports email as username"""
+
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -52,4 +53,3 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}, {self.email}'
-

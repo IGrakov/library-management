@@ -1,6 +1,6 @@
-from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema_view, extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import generics
 
 from book.models import Book
 from book.pagination import ResultSetPagination
@@ -9,6 +9,7 @@ from book.serializers import BookSerializer
 
 class CreateBookView(generics.CreateAPIView):
     """Create new book"""
+
     serializer_class = BookSerializer
     queryset = Book.objects.all()
 
@@ -25,7 +26,7 @@ class CreateBookView(generics.CreateAPIView):
     ),
     delete=extend_schema(
         description='Delete book by id',
-    )
+    ),
 )
 class RetrieveUpdateDeleteBookView(
     generics.RetrieveAPIView,
@@ -33,12 +34,14 @@ class RetrieveUpdateDeleteBookView(
     generics.DestroyAPIView,
 ):
     """Retrieve, update or delete book by id"""
+
     serializer_class = BookSerializer
     queryset = Book.objects.all()
 
 
 class ListBookView(generics.ListAPIView):
     """List books"""
+
     serializer_class = BookSerializer
     queryset = Book.objects.all()
     pagination_class = ResultSetPagination

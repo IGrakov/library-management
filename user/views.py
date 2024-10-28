@@ -1,27 +1,26 @@
 from rest_framework import generics
+from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
-from rest_framework.authtoken.models import Token
 
 from .models import User
-from .serializers import (
-    UserSerializer,
-    AuthTokenSerializer
-)
+from .serializers import AuthTokenSerializer, UserSerializer
 
 
 class CreateUserView(generics.CreateAPIView):
     """Create a new user un the system"""
+
     serializer_class = UserSerializer
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
 
 class CreateTokenView(ObtainAuthToken):
     """Create a new auth token for user"""
+
     serializer_class = AuthTokenSerializer
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
     def post(self, request, *args, **kwargs):
@@ -34,6 +33,7 @@ class CreateTokenView(ObtainAuthToken):
 
 class ManageUserView(generics.RetrieveUpdateAPIView):
     """Manage authenticated user"""
+
     serializer_class = UserSerializer
 
     def get_object(self):
@@ -43,5 +43,6 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 
 class ListUserView(generics.ListAPIView):
     """Create a new user un the system"""
+
     serializer_class = UserSerializer
     queryset = User.objects.all()

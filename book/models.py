@@ -6,6 +6,7 @@ from reference_values.models import Language
 
 class Author(TimeStampMixin):
     """Model for an author"""
+
     last_name = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100, null=True, blank=True)
     middle_name = models.CharField(max_length=100, null=True, blank=True)
@@ -19,6 +20,7 @@ class Author(TimeStampMixin):
 
 class Book(TimeStampMixin):
     """Model for a book"""
+
     title = models.CharField(max_length=255, null=False, blank=False)
     author = models.ManyToManyField(Author)
     published_date = models.DateField(null=True)
@@ -28,9 +30,7 @@ class Book(TimeStampMixin):
     language = models.ManyToManyField(Language)
 
     def __str__(self):
-        return (
-            f"{self.title} - by {self.author} - ISBN: {self.isbn} - in {self.language}"
-        )
+        return f"{self.title} - by {self.author} - ISBN: {self.isbn} - in {self.language}"
 
     class Meta:
         verbose_name = 'Book'
