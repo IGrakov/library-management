@@ -20,6 +20,9 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from core.api.views import health
 
+admin.site.site_title = "Library management admin (DEV)"
+admin.site.site_header = "Library management administration"
+admin.site.index_title = "Site administration"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("health/", health, name="health"),
