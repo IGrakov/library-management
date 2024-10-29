@@ -4,9 +4,10 @@ from reference_values.models import Language
 
 
 class LanguageSerializer(serializers.ModelSerializer):
-    model = Language
 
     class Meta:
+        model = Language
+
         fields = [
             'id',
             'name',

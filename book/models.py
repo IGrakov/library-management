@@ -23,10 +23,10 @@ class Book(TimeStampMixin):
 
     title = models.CharField(max_length=255, null=False, blank=False)
     author = models.ManyToManyField(Author)
-    published_date = models.DateField(null=True)
+    published_date = models.DateField(null=True, blank=True)
     isbn = models.CharField(max_length=17, null=False, blank=False, unique=True)
-    pages = models.IntegerField(null=True)
-    cover = models.URLField(null=True)
+    pages = models.IntegerField(null=True, blank=True)
+    cover = models.URLField(null=True, blank=True)
     language = models.ManyToManyField(Language)
 
     def __str__(self):

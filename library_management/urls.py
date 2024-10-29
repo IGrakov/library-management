@@ -31,4 +31,5 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/user/', include('user.urls')),
     path('api/book/', include('book.urls')),
+    path('api/reference-value/', include('reference_values.urls')),
 ]
