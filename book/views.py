@@ -7,6 +7,9 @@ from book.pagination import ResultSetPagination
 from book.serializers import AuthorSerializer, BookSerializer
 
 
+@extend_schema(
+    tags=['author'],
+)
 class CreateAuthorView(generics.CreateAPIView):
     """Create new author"""
 
@@ -28,6 +31,9 @@ class CreateAuthorView(generics.CreateAPIView):
         description='Delete author by id',
     ),
 )
+@extend_schema(
+    tags=['author'],
+)
 class RetrieveUpdateDeleteAuthorView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete author by id"""
 
@@ -35,6 +41,9 @@ class RetrieveUpdateDeleteAuthorView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Author.objects.all()
 
 
+@extend_schema(
+    tags=['author'],
+)
 class ListAuthorView(generics.ListAPIView):
     """List authors"""
 
