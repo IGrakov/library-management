@@ -5,6 +5,7 @@ from rest_framework import generics
 from book.models import Author, Book
 from book.pagination import ResultSetPagination
 from book.serializers import AuthorSerializer, BookSerializer
+from user.permissions import IsAdmin
 
 
 @extend_schema(
@@ -13,6 +14,7 @@ from book.serializers import AuthorSerializer, BookSerializer
 class CreateAuthorView(generics.CreateAPIView):
     """Create new author"""
 
+    permission_classes = (IsAdmin,)
     serializer_class = AuthorSerializer
     queryset = Author.objects.all()
 
@@ -37,6 +39,7 @@ class CreateAuthorView(generics.CreateAPIView):
 class RetrieveUpdateDeleteAuthorView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete author by id"""
 
+    permission_classes = (IsAdmin,)
     serializer_class = AuthorSerializer
     queryset = Author.objects.all()
 
@@ -54,6 +57,7 @@ class ListAuthorView(generics.ListAPIView):
 class CreateBookView(generics.CreateAPIView):
     """Create new book"""
 
+    permission_classes = (IsAdmin,)
     serializer_class = BookSerializer
     queryset = Book.objects.all()
 
@@ -75,6 +79,7 @@ class CreateBookView(generics.CreateAPIView):
 class RetrieveUpdateDeleteBookView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete book by id"""
 
+    permission_classes = (IsAdmin,)
     serializer_class = BookSerializer
     queryset = Book.objects.all()
 

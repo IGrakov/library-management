@@ -3,11 +3,13 @@ from rest_framework import generics
 
 from reference_values.models import Language
 from reference_values.serializers import LanguageSerializer
+from user.permissions import IsAdmin
 
 
 class CreateLanguageView(generics.CreateAPIView):
     """Add new language"""
 
+    permission_classes = (IsAdmin,)
     serializer_class = LanguageSerializer
     queryset = Language.objects.all()
 
@@ -29,6 +31,7 @@ class CreateLanguageView(generics.CreateAPIView):
 class RetrieveUpdateDeleteLanguageView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete language by id"""
 
+    permission_classes = (IsAdmin,)
     serializer_class = LanguageSerializer
     queryset = Language.objects.all()
 
