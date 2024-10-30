@@ -154,14 +154,15 @@ class PrivateLanguageApiUserAdminTest(TestCase):
         res = self.client.get(reverse('reference_values:manage_language', kwargs={'pk': language_id}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-    def test_delete_language_by_user_admin_fails(self):
+    def test_delete_language_by_user_admin_success(self):
         """Test deleting a language by a user in admin group"""
         LanguageFactory.create()
         language_id = Language.objects.first().id
         res = self.client.delete(reverse('reference_values:manage_language', kwargs={'pk': language_id}))
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Language.objects.filter(id=language_id).first(), None)
 
-    def test_update_language_by_user_admin_fails(self):
+    def test_update_language_by_user_admin_success(self):
         """Test updating a language by a user in admin group"""
         LanguageFactory.create()
         language_id = Language.objects.first().id
@@ -175,7 +176,7 @@ class PrivateLanguageApiUserAdminTest(TestCase):
         res = self.client.put(reverse('reference_values:manage_language', kwargs={'pk': language_id}), payload)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-    def test_list_languages_by_user_admin_fails(self):
+    def test_list_languages_by_user_admin_success(self):
         """Test getting list of languages by a user in admin group"""
         LanguageFactory.create_batch(2)
         res = self.client.get(LIST_LANGUAGE_URL)
