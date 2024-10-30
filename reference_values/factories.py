@@ -8,5 +8,5 @@ class LanguageFactory(factory.django.DjangoModelFactory):
         model = Language
 
     name = factory.Faker('language_name')
-    two_letter_code = name[:2].upper()
-    three_letter_code = name[:3].upper()
+    two_letter_code = factory.LazyAttribute(lambda a: a.name[:2].lower())
+    three_letter_code = factory.LazyAttribute(lambda a: a.name[:3].lower())
