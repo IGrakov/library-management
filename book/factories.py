@@ -1,3 +1,5 @@
+import random
+
 import factory
 
 from book.models import Author, Book
@@ -10,17 +12,37 @@ class AuthorFactory(factory.django.DjangoModelFactory):
 
     last_name = factory.Faker('last_name')
     first_name = factory.Faker('first_name')
-    middle_name = factory.Faker('middle_name')
+    middle_name = factory.Faker('first_name')
 
 
 class BookFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Book
 
-    title = factory.SubFactory(AuthorFactory)
-    author = factory.Faker('name')
+    title = factory.Faker('sentence', nb_words=5, variable_nb_words=True)
     published_date = factory.Faker('date')
     isbn = factory.Sequence(lambda n: f'{n}-{n}-{n}-{n}-{n}')
     pages = factory.Faker('pyint', min_value=10, max_value=1_000)
     cover = factory.Faker('image_url')
-    language = factory.SubFactory(LanguageFactory)
+
+    @factory.post_generation
+    def author(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            self.author.add(*extracted)
+        else:
+            num_of_authors = random.randint(1, 3)
+            self.author.add(*AuthorFactory.create_batch(num_of_authors))
+
+    @factory.post_generation
+    def language(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            self.language.add(*extracted)
+        else:
+            num_of_languages = random.randint(1, 3)
+            self.language.add(*LanguageFactory.create_batch(num_of_languages))
