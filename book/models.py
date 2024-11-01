@@ -22,12 +22,12 @@ class Book(TimeStampMixin):
     """Model for a book"""
 
     title = models.CharField(max_length=255, null=False, blank=False)
-    author = models.ManyToManyField(Author)
+    author = models.ManyToManyField(Author, blank=True, related_name='books')
     published_date = models.DateField(null=True, blank=True)
     isbn = models.CharField(max_length=17, null=False, blank=False, unique=True)
     pages = models.IntegerField(null=True, blank=True)
     cover = models.URLField(null=True, blank=True)
-    language = models.ManyToManyField(Language)
+    language = models.ManyToManyField(Language, blank=True, related_name='books')
 
     def __str__(self):
         author_lst = []
