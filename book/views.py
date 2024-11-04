@@ -1,7 +1,8 @@
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import rest_framework as filters
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics
 
+from book.filters import BookFilter
 from book.models import Author, Book
 from book.pagination import ResultSetPagination
 from book.serializers import AuthorSerializer, BookSerializer, BookWriteSerializer
@@ -92,8 +93,8 @@ class RetrieveUpdateDeleteBookView(generics.RetrieveUpdateDestroyAPIView):
 class ListBookView(generics.ListAPIView):
     """List books"""
 
-    serializer_class = BookSerializer
     queryset = Book.objects.all()
+    serializer_class = BookSerializer
     pagination_class = ResultSetPagination
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['author', 'published_date', 'language']
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = BookFilter
