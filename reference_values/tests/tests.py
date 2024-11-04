@@ -33,22 +33,19 @@ class PublicLanguageApiTest(TestCase):
 
     def test_retrieve_language_by_unauthenticated_user_fails(self):
         """Test retrieving a language by an unauthenticated user"""
-        LanguageFactory.create()
-        language_id = Language.objects.first().id
-        res = self.client.get(reverse('reference_values:manage_language', kwargs={'pk': language_id}))
+        language = LanguageFactory.create()
+        res = self.client.get(reverse('reference_values:manage_language', kwargs={'pk': language.id}))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_language_by_unauthenticated_user_fails(self):
         """Test deleting a language by an unauthenticated user"""
-        LanguageFactory.create()
-        language_id = Language.objects.first().id
-        res = self.client.delete(reverse('reference_values:manage_language', kwargs={'pk': language_id}))
+        language = LanguageFactory.create()
+        res = self.client.delete(reverse('reference_values:manage_language', kwargs={'pk': language.id}))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_language_by_unauthenticated_user_fails(self):
         """Test updating a language by an unauthenticated user"""
-        LanguageFactory.create()
-        language_id = Language.objects.first().id
+        language = LanguageFactory.create()
 
         payload = {
             'name': 'Test language',
@@ -56,7 +53,7 @@ class PublicLanguageApiTest(TestCase):
             'three_letter_code': 'abc'
         }
 
-        res = self.client.put(reverse('reference_values:manage_language', kwargs={'pk': language_id}), payload)
+        res = self.client.put(reverse('reference_values:manage_language', kwargs={'pk': language.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_list_languages_by_unauthenticated_user_fails(self):
@@ -92,22 +89,19 @@ class PrivateLanguageApiUserNotAdminTest(TestCase):
 
     def test_retrieve_language_by_user_not_admin_success(self):
         """Test retrieving a language by an authenticated user not in admin group"""
-        LanguageFactory.create()
-        language_id = Language.objects.first().id
-        res = self.client.get(reverse('reference_values:manage_language', kwargs={'pk': language_id}))
+        language = LanguageFactory.create()
+        res = self.client.get(reverse('reference_values:manage_language', kwargs={'pk': language.id}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_delete_language_by_user_not_admin_fails(self):
         """Test deleting a language by an authenticated user not in admin group"""
-        LanguageFactory.create()
-        language_id = Language.objects.first().id
-        res = self.client.delete(reverse('reference_values:manage_language', kwargs={'pk': language_id}))
+        language = LanguageFactory.create()
+        res = self.client.delete(reverse('reference_values:manage_language', kwargs={'pk': language.id}))
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_update_language_by_user_not_admin_fails(self):
         """Test updating a language by an authenticated user not in admin group"""
-        LanguageFactory.create()
-        language_id = Language.objects.first().id
+        language = LanguageFactory.create()
 
         payload = {
             'name': 'Test language',
@@ -115,7 +109,7 @@ class PrivateLanguageApiUserNotAdminTest(TestCase):
             'three_letter_code': 'abc'
         }
 
-        res = self.client.put(reverse('reference_values:manage_language', kwargs={'pk': language_id}), payload)
+        res = self.client.put(reverse('reference_values:manage_language', kwargs={'pk': language.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_list_languages_by_user_not_admin_fails(self):
@@ -149,23 +143,20 @@ class PrivateLanguageApiUserAdminTest(TestCase):
 
     def test_retrieve_language_by_user_admin_success(self):
         """Test retrieving a language by an authenticated user in admin group"""
-        LanguageFactory.create()
-        language_id = Language.objects.first().id
-        res = self.client.get(reverse('reference_values:manage_language', kwargs={'pk': language_id}))
+        language = LanguageFactory.create()
+        res = self.client.get(reverse('reference_values:manage_language', kwargs={'pk': language.id}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_delete_language_by_user_admin_success(self):
         """Test deleting a language by an authenticated user in admin group"""
-        LanguageFactory.create()
-        language_id = Language.objects.first().id
-        res = self.client.delete(reverse('reference_values:manage_language', kwargs={'pk': language_id}))
+        language = LanguageFactory.create()
+        res = self.client.delete(reverse('reference_values:manage_language', kwargs={'pk': language.id}))
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(Language.objects.filter(id=language_id).first(), None)
+        self.assertEqual(Language.objects.filter(id=language.id).first(), None)
 
     def test_update_language_by_user_admin_success(self):
         """Test updating a language by an authenticated user in admin group"""
-        LanguageFactory.create()
-        language_id = Language.objects.first().id
+        language = LanguageFactory.create()
 
         payload = {
             'name': 'Test language',
@@ -173,7 +164,7 @@ class PrivateLanguageApiUserAdminTest(TestCase):
             'three_letter_code': 'abc'
         }
 
-        res = self.client.put(reverse('reference_values:manage_language', kwargs={'pk': language_id}), payload)
+        res = self.client.put(reverse('reference_values:manage_language', kwargs={'pk': language.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_list_languages_by_user_admin_success(self):
