@@ -8,4 +8,7 @@ urlpatterns = [
     path('add-language/', views.CreateLanguageView.as_view(), name='add_language'),
     path('manage-language/<int:pk>/', views.RetrieveUpdateDeleteLanguageView.as_view(), name='manage_language'),
     path('list-language/', views.ListLanguageView.as_view(), name='list_language'),
+    path('add-genre/', views.CreateGenreView.as_view(), name='add_genre'),
+    path('manage-genre/<int:pk>/', views.RetrieveUpdateDeleteGenreView.as_view(), name='manage_genre'),
+    path('list-genre/', views.ListGenreView.as_view(), name='list_genre'),
 ]

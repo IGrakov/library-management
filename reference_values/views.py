@@ -1,11 +1,14 @@
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics
 
-from reference_values.models import Language
-from reference_values.serializers import LanguageSerializer
+from reference_values.models import Genre, Language
+from reference_values.serializers import GenreSerializer, LanguageSerializer
 from user.permissions import IsAdmin
 
 
+@extend_schema(
+    tags=['language'],
+)
 class CreateLanguageView(generics.CreateAPIView):
     """Add new language"""
 
@@ -28,6 +31,9 @@ class CreateLanguageView(generics.CreateAPIView):
         description='Delete language by id',
     ),
 )
+@extend_schema(
+    tags=['language'],
+)
 class RetrieveUpdateDeleteLanguageView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete language by id"""
 
@@ -36,8 +42,57 @@ class RetrieveUpdateDeleteLanguageView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Language.objects.all()
 
 
+@extend_schema(
+    tags=['language'],
+)
 class ListLanguageView(generics.ListAPIView):
     """List languages"""
 
     serializer_class = LanguageSerializer
     queryset = Language.objects.all()
+
+
+@extend_schema(
+    tags=['genre'],
+)
+class CreateGenreView(generics.CreateAPIView):
+    """Add new genre"""
+
+    permission_classes = (IsAdmin,)
+    serializer_class = GenreSerializer
+    queryset = Genre.objects.all()
+
+
+@extend_schema_view(
+    get=extend_schema(
+        description='Retrieve genre by id',
+    ),
+    put=extend_schema(
+        description='Update genre by id',
+    ),
+    patch=extend_schema(
+        description='Partially update genre by id',
+    ),
+    delete=extend_schema(
+        description='Delete genre by id',
+    ),
+)
+@extend_schema(
+    tags=['genre'],
+)
+class RetrieveUpdateDeleteGenreView(generics.RetrieveUpdateDestroyAPIView):
+    """Retrieve, update or delete genre by id"""
+
+    permission_classes = (IsAdmin,)
+    serializer_class = GenreSerializer
+    queryset = Genre.objects.all()
+
+
+@extend_schema(
+    tags=['genre'],
+)
+class ListGenreView(generics.ListAPIView):
+    """List genres"""
+
+    serializer_class = GenreSerializer
+    queryset = Genre.objects.all()

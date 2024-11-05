@@ -1,7 +1,7 @@
 from django.db import models
 
 from core.models import TimeStampMixin
-from reference_values.models import Language
+from reference_values.models import Genre, Language
 
 
 class Author(TimeStampMixin):
@@ -28,6 +28,7 @@ class Book(TimeStampMixin):
     pages = models.IntegerField(null=True, blank=True)
     cover = models.URLField(null=True, blank=True)
     language = models.ManyToManyField(Language, blank=True, related_name='books')
+    genre = models.ManyToManyField(Genre, blank=True, related_name='books')
 
     def __str__(self):
         author_lst = []
@@ -41,7 +42,12 @@ class Book(TimeStampMixin):
             language_lst.append(f'{language.two_letter_code}')
         languages = ', '.join(language_lst)
 
-        return f'{self.title} - by {authors} - ISBN: {self.isbn} - in {languages}'
+        genre_lst = []
+        for genre in self.genre.all():
+            genre_lst.append(f'{genre.name}')
+        genres = ', '.join(genre_lst)
+
+        return f'{self.title} - by {authors} - ISBN: {self.isbn} - in {languages} - in {genres}'
 
     class Meta:
         verbose_name = 'Book'

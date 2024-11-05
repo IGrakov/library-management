@@ -16,3 +16,15 @@ class Language(TimeStampMixin):
 
     class Meta:
         verbose_name = 'Language'
+
+
+class Genre(TimeStampMixin):
+    """Model for reference value of book genre"""
+
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Genre'

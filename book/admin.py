@@ -28,6 +28,13 @@ class BookAdmin(admin.ModelAdmin):
             languages.append(language.two_letter_code)
         return ', '.join(languages)
 
+    @admin.display(description='Genres')
+    def genres(self, book):
+        genres = []
+        for genre in book.genres.all():
+            genres.append(genre.name)
+        return ', '.join(genres)
+
     list_display = (
         'title',
         'authors',
@@ -35,9 +42,12 @@ class BookAdmin(admin.ModelAdmin):
         'isbn',
         'pages',
         'languages',
+        'genres',
     )
     list_filter = (
         'title',
         'author',
+        'language',
+        'genre',
     )
     ordering = ('title',)
