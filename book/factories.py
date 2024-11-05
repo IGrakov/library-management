@@ -21,7 +21,7 @@ class BookFactory(factory.django.DjangoModelFactory):
 
     title = factory.Faker('sentence', nb_words=5, variable_nb_words=True)
     published_date = factory.Faker('date')
-    isbn = factory.Sequence(lambda n: f'{n}-{n}-{n}-{n}-{n}')
+    isbn = factory.Sequence(lambda n: f'{n}-{n}-{n}-{n}-{n}'[:17])
     pages = factory.Faker('pyint', min_value=10, max_value=1_000)
     cover = factory.Faker('image_url')
 
