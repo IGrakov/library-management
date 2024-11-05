@@ -6,9 +6,9 @@ from book.models import Book
 class BookFilter(filters.FilterSet):
     title = filters.CharFilter(field_name='title', lookup_expr='icontains')
     author = filters.CharFilter(field_name='author__last_name', lookup_expr='icontains')
-    published_date = filters.NumberFilter(field_name='published_date__year', lookup_expr='exact')
+    publication_year = filters.NumberFilter(field_name='published_date__year', lookup_expr='exact')
     language = filters.CharFilter(field_name='language__two_letter_code', lookup_expr='exact')
 
     class Meta:
         model = Book
-        fields = ['title', 'author', 'published_date', 'language']
+        fields = ['title', 'author', 'publication_year', 'language']

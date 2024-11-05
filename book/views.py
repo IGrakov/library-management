@@ -1,6 +1,7 @@
 from django_filters import rest_framework as filters
-from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import generics
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
+from rest_framework import generics, status
 
 from book.filters import BookFilter
 from book.models import Author, Book
@@ -55,6 +56,14 @@ class ListAuthorView(generics.ListAPIView):
     queryset = Author.objects.all()
 
 
+@extend_schema_view(
+    post=extend_schema(
+        request=BookWriteSerializer,
+        responses={
+            status.HTTP_201_CREATED: BookSerializer,
+        },
+    )
+)
 class CreateBookView(generics.CreateAPIView):
     """Create new book"""
 
@@ -90,10 +99,34 @@ class RetrieveUpdateDeleteBookView(generics.RetrieveUpdateDestroyAPIView):
             return BookSerializer
 
 
+@extend_schema_view(
+    get=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='author',
+                description='String that is contained in author last name',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name='language',
+                description='Two letter language code',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name='title',
+                description='String that is contained in title',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+    ),
+)
 class ListBookView(generics.ListAPIView):
     """List books"""
 
-    queryset = Book.objects.all()
+    queryset = Book.objects.all().prefetch_related('author', 'language')
     serializer_class = BookSerializer
     pagination_class = ResultSetPagination
     filter_backends = (filters.DjangoFilterBackend,)
