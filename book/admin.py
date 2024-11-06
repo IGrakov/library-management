@@ -11,6 +11,8 @@ class AuthorAdmin(admin.ModelAdmin):
     list_filter = ('last_name',)
     ordering = ('last_name',)
 
+    list_per_page = 20
+
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
@@ -51,3 +53,5 @@ class BookAdmin(admin.ModelAdmin):
         'genre',
     )
     ordering = ('title',)
+
+    list_per_page = 20
