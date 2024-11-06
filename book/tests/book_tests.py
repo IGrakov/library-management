@@ -2,15 +2,15 @@ from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.urls import reverse
 
-from rest_framework.test import APIClient
 from rest_framework import status
+from rest_framework.test import APIClient
 
 from book.models import Book
 from book.constants import NUM_OF_ITEMS_PER_PAGE
 from book.factories import AuthorFactory, BookFactory
 from book.serializers import AuthorSerializer
-from reference_values.factories import LanguageFactory
-from reference_values.serializers import LanguageSerializer
+from reference_values.factories import GenreFactory, LanguageFactory
+from reference_values.serializers import GenreSerializer, LanguageSerializer
 from user import constants
 from user.factories import UserFactory
 
@@ -30,12 +30,14 @@ class PublicBookApiTests(TestCase):
 
         author = AuthorFactory()
         language = LanguageFactory()
+        genre = GenreFactory()
 
         payload = {
             'title': 'Test book',
             'author': [author.id],
             'isbn': '111',
-            'language': [language.id]
+            'language': [language.id],
+            'genre': [genre.id]
         }
 
         res = self.client.post(CREATE_BOOK_URL, payload)
@@ -59,6 +61,7 @@ class PublicBookApiTests(TestCase):
 
         author_ids = [author.id for author in second_book.author.all()]
         language_ids = [language.id for language in second_book.language.all()]
+        genre_ids = [genre.id for genre in second_book.genre.all()]
 
         payload = {
             'id': first_book.id,
@@ -68,7 +71,8 @@ class PublicBookApiTests(TestCase):
             'isbn': 'Updated isbn',
             'pages': 10,
             'cover': 'http://www.test.com/test.jpg',
-            'language': language_ids
+            'language': language_ids,
+            'genre': genre_ids,
         }
 
         res = self.client.put(reverse('book:manage_book', kwargs={'pk': first_book.id}), payload)
@@ -98,12 +102,14 @@ class PrivateBookApiUserAdminTests(TestCase):
 
         author = AuthorFactory()
         language = LanguageFactory()
+        genre = GenreFactory()
 
         payload = {
             'title': 'Test book',
             'author': [author.id],
             'isbn': '111',
             'language': [language.id],
+            'genre': [genre.id]
         }
 
         res = self.client.post(CREATE_BOOK_URL, payload)
@@ -121,7 +127,8 @@ class PrivateBookApiUserAdminTests(TestCase):
             'isbn': book.isbn,
             'pages': book.pages,
             'cover': book.cover,
-            'language': LanguageSerializer(book.language, many=True).data
+            'language': LanguageSerializer(book.language, many=True).data,
+            'genre': GenreSerializer(book.genre, many=True).data
         }
         self.assertEqual(res.json(), expected_data)
 
@@ -136,7 +143,8 @@ class PrivateBookApiUserAdminTests(TestCase):
             'isbn': book.isbn,
             'pages': book.pages,
             'cover': book.cover,
-            'language': LanguageSerializer(book.language, many=True).data
+            'language': LanguageSerializer(book.language, many=True).data,
+            'genre': GenreSerializer(book.genre, many=True).data
         }
         res = self.client.get(reverse('book:manage_book', kwargs={'pk': book.id}))
         self.assertEqual(res.json(), expected_data)
@@ -163,7 +171,8 @@ class PrivateBookApiUserAdminTests(TestCase):
             'isbn': book.isbn,
             'pages': book.pages,
             'cover': book.cover,
-            'language': LanguageSerializer(book.language, many=True).data
+            'language': LanguageSerializer(book.language, many=True).data,
+            'genre': GenreSerializer(book.genre, many=True).data
         }
 
         res = self.client.patch(reverse('book:manage_book', kwargs={'pk': book.id}), payload)
@@ -176,6 +185,7 @@ class PrivateBookApiUserAdminTests(TestCase):
 
         author_ids = [author.id for author in second_book.author.all()]
         language_ids = [language.id for language in second_book.language.all()]
+        genre_ids = [genre.id for genre in second_book.genre.all()]
 
         payload = {
             'id': first_book.id,
@@ -185,7 +195,8 @@ class PrivateBookApiUserAdminTests(TestCase):
             'isbn': 'Updated isbn',
             'pages': 10,
             'cover': 'http://www.test.com/test.jpg',
-            'language': language_ids
+            'language': language_ids,
+            'genre': genre_ids
         }
 
         expected_data = {
@@ -196,7 +207,8 @@ class PrivateBookApiUserAdminTests(TestCase):
             'isbn': 'Updated isbn',
             'pages': 10,
             'cover': 'http://www.test.com/test.jpg',
-            'language': LanguageSerializer(second_book.language, many=True).data
+            'language': LanguageSerializer(second_book.language, many=True).data,
+            'genre': GenreSerializer(second_book.genre, many=True).data
         }
 
         res = self.client.put(reverse('book:manage_book', kwargs={'pk': first_book.id}), payload)
@@ -232,7 +244,7 @@ class PrivateBookApiUserAdminTests(TestCase):
         self.assertEqual(len(res.json().get('results')), 1)
         self.assertEqual(res.json().get('results')[0].get('author')[0].get('last_name'), 'foo')
 
-        res = self.client.get(LIST_BOOK_URL, {'published_date': 1990})
+        res = self.client.get(LIST_BOOK_URL, {'publication_year': 1990})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.json().get('results')), 1)
         self.assertEqual(res.json().get('results')[0].get('published_date'), '1990-01-01')
@@ -261,12 +273,14 @@ class PrivateBookApiUserNotAdminTests(TestCase):
 
         author = AuthorFactory()
         language = LanguageFactory()
+        genre = GenreFactory()
 
         payload = {
             'title': 'Test book',
             'author': [author.id],
             'isbn': '111',
             'language': [language.id],
+            'genre': [genre.id]
         }
 
         res = self.client.post(CREATE_BOOK_URL, payload)
@@ -283,7 +297,8 @@ class PrivateBookApiUserNotAdminTests(TestCase):
             'isbn': book.isbn,
             'pages': book.pages,
             'cover': book.cover,
-            'language': LanguageSerializer(book.language, many=True).data
+            'language': LanguageSerializer(book.language, many=True).data,
+            'genre': GenreSerializer(book.genre, many=True).data
         }
         res = self.client.get(reverse('book:manage_book', kwargs={'pk': book.id}))
         self.assertEqual(res.json(), expected_data)
@@ -300,6 +315,7 @@ class PrivateBookApiUserNotAdminTests(TestCase):
 
         author_ids = [author.id for author in second_book.author.all()]
         language_ids = [language.id for language in second_book.language.all()]
+        genre_ids = [genre.id for genre in second_book.genre.all()]
 
         payload = {
             'id': first_book.id,
@@ -309,7 +325,8 @@ class PrivateBookApiUserNotAdminTests(TestCase):
             'isbn': 'Updated isbn',
             'pages': 10,
             'cover': 'http://www.test.com/test.jpg',
-            'language': language_ids
+            'language': language_ids,
+            'genre': genre_ids
         }
 
         res = self.client.put(reverse('book:manage_book', kwargs={'pk': first_book.id}), payload)

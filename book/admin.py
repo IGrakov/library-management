@@ -31,7 +31,7 @@ class BookAdmin(admin.ModelAdmin):
     @admin.display(description='Genres')
     def genres(self, book):
         genres = []
-        for genre in book.genres.all():
+        for genre in book.genre.all():
             genres.append(genre.name)
         return ', '.join(genres)
 

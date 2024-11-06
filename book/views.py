@@ -126,7 +126,7 @@ class RetrieveUpdateDeleteBookView(generics.RetrieveUpdateDestroyAPIView):
 class ListBookView(generics.ListAPIView):
     """List books"""
 
-    queryset = Book.objects.all().prefetch_related('author', 'language')
+    queryset = Book.objects.all().prefetch_related('author', 'language', 'genre')
     serializer_class = BookSerializer
     pagination_class = ResultSetPagination
     filter_backends = (filters.DjangoFilterBackend,)

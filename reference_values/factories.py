@@ -16,4 +16,4 @@ class GenreFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Genre
 
-    name = factory.Faker('language_name')
+    name = factory.Faker('word')
