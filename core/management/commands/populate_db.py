@@ -3,7 +3,7 @@ from faker import Faker
 
 from django.core.management.base import BaseCommand
 
-from book.models import Author, Book
+from book.models import Author, Book, BookCopy
 from reference_values.models import Genre, Language
 
 NUM_OF_AUTHORS = 20
@@ -47,6 +47,7 @@ class Command(BaseCommand):
                 three_letter_code=language['three_letter_code'],
             )
 
+
         # populate database with genres
         genres = [
             'Fantasy', 'Science Fiction', 'Mystery', 'Horror', 'Romance', 'Children\'s', 'Science & Technology',
@@ -56,6 +57,7 @@ class Command(BaseCommand):
 
         for genre in genres:
             Genre.objects.get_or_create(name=genre)
+
 
         # populate database with authors
         for _ in range(NUM_OF_AUTHORS):
@@ -67,6 +69,7 @@ class Command(BaseCommand):
                 middle_name = fake.first_name()
 
             Author.objects.get_or_create(last_name=last_name, first_name=first_name, middle_name=middle_name)
+
 
         # populate database with books
         author_choices = [1, 1, 1, 1, 2, 2, 3]  # to ensure unequal distribution of choices
@@ -97,5 +100,25 @@ class Command(BaseCommand):
                 for _ in range(num_of_genres):
                     genre = Genre.objects.order_by('?').first()
                     book.genre.add(genre)
+
+                book.save()
+
+
+        # populate database with book copies
+
+        books = Book.objects.all()
+
+        book_copy_choices = [1, 1, 1, 1, 2, 2, 2, 3, 4]
+
+        for book in books:
+            num_of_copies = random.choice(book_copy_choices)
+            book_copies = []
+            for _ in range(num_of_copies):
+                book_copies.append(BookCopy(
+                    book=book,
+                    uid = fake.uuid4()
+                ))
+            BookCopy.objects.bulk_create(book_copies)
+
 
         self.stdout.write(self.style.SUCCESS("Successfully populated the database"))
