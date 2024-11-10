@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from book.models import Author, Book
+from book.models import Author, Book, BookCopy
 
 
 @admin.register(Author)
@@ -37,6 +37,10 @@ class BookAdmin(admin.ModelAdmin):
             genres.append(genre.name)
         return ', '.join(genres)
 
+    @admin.display(description='Copies')
+    def copies(self, book):
+        return BookCopy.objects.filter(book=book).count()
+
     list_display = (
         'title',
         'authors',
@@ -45,6 +49,7 @@ class BookAdmin(admin.ModelAdmin):
         'pages',
         'languages',
         'genres',
+        'copies',
     )
     search_fields = ('title',)
     list_filter = (
@@ -52,5 +57,22 @@ class BookAdmin(admin.ModelAdmin):
         'genre',
     )
     ordering = ('title',)
+
+    list_per_page = 20
+
+
+@admin.register(BookCopy)
+class BookCopyAdmin(admin.ModelAdmin):
+
+    list_select_related = ('book',)
+    list_display = (
+        'book',
+        'uid',
+    )
+    ordering = (
+        'book__title',
+        'book__isbn',
+        'uid',
+    )
 
     list_per_page = 20

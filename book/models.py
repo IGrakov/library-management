@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 from core.models import TimeStampMixin
@@ -51,3 +53,17 @@ class Book(TimeStampMixin):
 
     class Meta:
         verbose_name = 'Book'
+
+
+class BookCopy(TimeStampMixin):
+    """Model for a book copy (with the same ISBN)"""
+
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='copies')
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
+    def __str__(self):
+        return f'Copy of book with ISBN {self.book.isbn} with uid {self.uid}'
+
+    class Meta:
+        verbose_name = 'Book copy'
+        verbose_name_plural = 'Book copies'
