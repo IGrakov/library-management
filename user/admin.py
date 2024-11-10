@@ -52,8 +52,8 @@ class UserAdmin(UserAdmin):
         'group',
     )
     list_filter = (
-        'email',
-        'last_name',
+        'is_active',
+        'is_staff',
     )
     ordering = (
         'email',
