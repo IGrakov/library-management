@@ -1,11 +1,17 @@
 import random
+
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from faker import Faker
 
 from django.core.management.base import BaseCommand
 
 from book.models import Author, Book, BookCopy
 from reference_values.models import Genre, Language
+from user import constants
 
+NUM_OF_LIBRARIANS = 2
+NUM_OF_READERS = 20
 NUM_OF_AUTHORS = 20
 NUM_OF_BOOKS = 100
 MIDDLE_NAME_PROBABILITY = 0.2
@@ -17,6 +23,31 @@ class Command(BaseCommand):
     help = "Populates database with random generated data"
 
     def handle(self, *args, **options):
+
+        # populate database with user groups
+        default_group, _ = Group.objects.get_or_create(name=constants.Roles.READER)
+        librarian_group, _ = Group.objects.get_or_create(name=constants.Roles.LIBRARIAN)
+
+
+        # populate database with users
+        user = get_user_model()
+
+        for i in range(NUM_OF_LIBRARIANS + NUM_OF_READERS):
+            last_name = fake.last_name()
+            first_name = fake.first_name()
+
+            usr, _ = user.objects.get_or_create(
+                last_name=last_name,
+                first_name=first_name,
+                email=fake.email(),
+                password='password',
+            )
+
+            if i < NUM_OF_LIBRARIANS:
+                librarian_group.user_set.add(usr)
+            else:
+                default_group.user_set.add(usr)
+
 
         # populate database with languages
         languages = [
@@ -105,7 +136,6 @@ class Command(BaseCommand):
 
 
         # populate database with book copies
-
         books = Book.objects.all()
 
         book_copy_choices = [1, 1, 1, 1, 2, 2, 2, 3, 4]
