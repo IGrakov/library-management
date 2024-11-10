@@ -2,7 +2,7 @@ import random
 
 import factory
 
-from book.models import Author, Book
+from book.models import Author, Book, BookCopy
 from reference_values.factories import GenreFactory, LanguageFactory
 
 
@@ -57,3 +57,11 @@ class BookFactory(factory.django.DjangoModelFactory):
         else:
             num_of_genres = random.randint(1, 3)
             self.genre.add(*GenreFactory.create_batch(num_of_genres))
+
+
+class BookCopyFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = BookCopy
+
+    book = factory.SubFactory(BookFactory)
+    uid = factory.Faker('uuid4')
