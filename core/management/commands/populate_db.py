@@ -36,17 +36,18 @@ class Command(BaseCommand):
             last_name = fake.last_name()
             first_name = fake.first_name()
 
-            usr, _ = user.objects.get_or_create(
+            usr, created = user.objects.get_or_create(
                 last_name=last_name,
                 first_name=first_name,
                 email=fake.email(),
                 password='password',
             )
 
-            if i < NUM_OF_LIBRARIANS:
-                librarian_group.user_set.add(usr)
-            else:
-                default_group.user_set.add(usr)
+            if created:
+                if i < NUM_OF_LIBRARIANS:
+                    librarian_group.user_set.add(usr)
+                else:
+                    default_group.user_set.add(usr)
 
 
         # populate database with languages
