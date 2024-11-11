@@ -64,4 +64,3 @@ class BookCopyFactory(factory.django.DjangoModelFactory):
         model = BookCopy
 
     book = factory.SubFactory(BookFactory)
-    uid = factory.Faker('uuid4')

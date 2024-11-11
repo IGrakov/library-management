@@ -1,7 +1,7 @@
 from django.db.transaction import atomic
 from rest_framework import serializers
 
-from book.models import Author, Book
+from book.models import Author, Book, BookCopy
 from reference_values.models import Genre, Language
 from reference_values.serializers import GenreSerializer, LanguageSerializer
 
@@ -122,4 +122,24 @@ class BookWriteSerializer(serializers.ModelSerializer):
             'cover',
             'language',
             'genre',
+        ]
+
+
+class BookCopySerializer(serializers.ModelSerializer):
+    book = BookSerializer(read_only=True)
+
+    book_id = serializers.PrimaryKeyRelatedField(
+        queryset=Book.objects.all(),
+        source='book',
+        write_only=True,
+    )
+
+    class Meta:
+        model = BookCopy
+
+        fields = [
+            'id',
+            'book',
+            'book_id',
+            'uid',
         ]

@@ -4,9 +4,14 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema
 from rest_framework import generics, status
 
 from book.filters import BookFilter
-from book.models import Author, Book
+from book.models import Author, Book, BookCopy
 from book.pagination import ResultSetPagination
-from book.serializers import AuthorSerializer, BookSerializer, BookWriteSerializer
+from book.serializers import (
+    AuthorSerializer,
+    BookCopySerializer,
+    BookSerializer,
+    BookWriteSerializer,
+)
 from user.permissions import IsAdmin
 
 
@@ -68,7 +73,7 @@ class CreateBookView(generics.CreateAPIView):
     """Create new book"""
 
     permission_classes = (IsAdmin,)
-    serializer_class = BookWriteSerializer
+    serializer_class = BookSerializer
     queryset = Book.objects.all()
 
 
@@ -131,3 +136,43 @@ class ListBookView(generics.ListAPIView):
     pagination_class = ResultSetPagination
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = BookFilter
+
+
+@extend_schema(
+    tags=['book copy'],
+)
+class CreateBookCopyView(generics.CreateAPIView):
+    """Create new book copy"""
+
+    permission_classes = (IsAdmin,)
+    serializer_class = BookCopySerializer
+    queryset = BookCopy.objects.all()
+
+
+@extend_schema_view(
+    get=extend_schema(
+        description='Retrieve book copy by id',
+    ),
+    delete=extend_schema(
+        description='Delete book copy by id',
+    ),
+)
+@extend_schema(
+    tags=['book copy'],
+)
+class RetrieveDeleteBookCopyView(generics.RetrieveDestroyAPIView):
+    """Retrieve, update or delete book copy by id"""
+
+    permission_classes = (IsAdmin,)
+    serializer_class = BookCopySerializer
+    queryset = BookCopy.objects.all()
+
+
+@extend_schema(
+    tags=['book copy'],
+)
+class ListBookCopyView(generics.ListAPIView):
+    """List book copies"""
+
+    serializer_class = BookCopySerializer
+    queryset = BookCopy.objects.all()
