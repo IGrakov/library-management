@@ -1,8 +1,8 @@
-from django.test import SimpleTestCase
+from django.test import TestCase
 from django.urls import reverse
 
 
-class HealthTest(SimpleTestCase):
+class HealthTest(TestCase):
     def test_status_code(self):
         """
         Always returns 200OK
