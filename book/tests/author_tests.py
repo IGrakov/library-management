@@ -35,13 +35,13 @@ class PublicAuthorApiTest(TestCase):
     def test_retrieve_author_by_unauthenticated_user_fails(self):
         """Test retrieving an author by an unauthenticated user"""
         author = AuthorFactory.create()
-        res = self.client.get(reverse('reference_values:manage_language', kwargs={'pk': author.id}))
+        res = self.client.get(reverse('book:manage_author', kwargs={'pk': author.id}))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_author_by_unauthenticated_user_fails(self):
         """Test deleting a language by an unauthenticated user"""
         author = AuthorFactory.create()
-        res = self.client.delete(reverse('reference_values:manage_language', kwargs={'pk': author.id}))
+        res = self.client.delete(reverse('book:manage_author', kwargs={'pk': author.id}))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_author_by_unauthenticated_user_fails(self):
@@ -111,7 +111,7 @@ class PrivateAuthorApiUserNotAdminTest(TestCase):
             'middle_name': 'Test middle name',
         }
 
-        res = self.client.put(reverse('reference_values:manage_language', kwargs={'pk': author.id}), payload)
+        res = self.client.put(reverse('book:manage_author', kwargs={'pk': author.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_list_author_by_user_not_admin_fails(self):
@@ -154,7 +154,7 @@ class PrivateAuthorApiUserAdminTest(TestCase):
         author = AuthorFactory.create()
         res = self.client.delete(reverse('book:manage_author', kwargs={'pk': author.id}))
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(Language.objects.filter(id=author.id).first(), None)
+        self.assertEqual(Author.objects.filter(id=author.id).first(), None)
 
     def test_update_author_by_user_admin_success(self):
         """Test updating an author by an authenticated user in admin group"""
