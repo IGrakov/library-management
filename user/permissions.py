@@ -10,3 +10,12 @@ class IsAdmin(permissions.BasePermission):
             or request.user.groups.filter(name=constants.Roles.ADMIN).exists()
         ):
             return True
+
+
+class IsLibrarian(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.user.is_authenticated and (
+            request.method in permissions.SAFE_METHODS
+            or request.user.groups.filter(name=constants.Roles.LIBRARIAN).exists()
+        ):
+            return True
