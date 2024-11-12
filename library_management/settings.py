@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'reference_values',
     'user',
     'book',
+    'reader_card',
 ]
 
 MIDDLEWARE = [

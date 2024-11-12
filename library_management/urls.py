@@ -32,6 +32,7 @@ urlpatterns = [
     path('api/user/', include('user.urls')),
     path('api/book/', include('book.urls')),
     path('api/reference-value/', include('reference_values.urls')),
+    path('api/reader-card/', include('reader_card.urls')),
 ]
 
 urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]

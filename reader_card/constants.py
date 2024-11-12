@@ -1,0 +1,3 @@
+ACCEPTED_PHOTO_FILE_EXTENSIONS = {
+    'pdf',
+}

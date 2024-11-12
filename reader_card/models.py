@@ -1,0 +1,17 @@
+from django.db import models
+
+from core.models import TimeStampMixin
+from reference_values.models import Hall
+from user.models import User
+
+
+class ReaderCard(TimeStampMixin):
+    """Model for card of a library reader"""
+
+    reader = models.OneToOneField(User, on_delete=models.CASCADE, related_name='reader_card')
+    is_suspended = models.BooleanField(default=False)
+    photo = models.ImageField(upload_to='static/reader_card_photo/', blank=True)
+    hall_access = models.ManyToManyField(Hall, related_name='reader_cards', blank=True)
+
+    def __str__(self):
+        return f'{self.reader.last_name} {self.reader.first_name}'
