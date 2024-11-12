@@ -1,8 +1,12 @@
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics
 
-from reference_values.models import Genre, Language
-from reference_values.serializers import GenreSerializer, LanguageSerializer
+from reference_values.models import Genre, Hall, Language
+from reference_values.serializers import (
+    GenreSerializer,
+    HallSerializer,
+    LanguageSerializer,
+)
 from user.permissions import IsAdmin
 
 
@@ -96,3 +100,49 @@ class ListGenreView(generics.ListAPIView):
 
     serializer_class = GenreSerializer
     queryset = Genre.objects.all()
+
+
+@extend_schema(
+    tags=['hall'],
+)
+class CreateHallView(generics.CreateAPIView):
+    """Add new hall"""
+
+    permission_classes = (IsAdmin,)
+    serializer_class = HallSerializer
+    queryset = Hall.objects.all()
+
+
+@extend_schema_view(
+    get=extend_schema(
+        description='Retrieve hall by id',
+    ),
+    put=extend_schema(
+        description='Update hall by id',
+    ),
+    patch=extend_schema(
+        description='Partially update hall by id',
+    ),
+    delete=extend_schema(
+        description='Delete hall by id',
+    ),
+)
+@extend_schema(
+    tags=['hall'],
+)
+class RetrieveUpdateDeleteHallView(generics.RetrieveUpdateDestroyAPIView):
+    """Retrieve, update or delete hall by id"""
+
+    permission_classes = (IsAdmin,)
+    serializer_class = HallSerializer
+    queryset = Hall.objects.all()
+
+
+@extend_schema(
+    tags=['hall'],
+)
+class ListHallView(generics.ListAPIView):
+    """List halls"""
+
+    serializer_class = HallSerializer
+    queryset = Hall.objects.all()
