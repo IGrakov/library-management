@@ -11,4 +11,7 @@ urlpatterns = [
     path('add-genre/', views.CreateGenreView.as_view(), name='add_genre'),
     path('manage-genre/<int:pk>/', views.RetrieveUpdateDeleteGenreView.as_view(), name='manage_genre'),
     path('list-genre/', views.ListGenreView.as_view(), name='list_genre'),
+    path('add-hall/', views.CreateHallView.as_view(), name='add_hall'),
+    path('manage-hall/<int:pk>/', views.RetrieveUpdateDeleteHallView.as_view(), name='manage_hall'),
+    path('list-hall/', views.ListHallView.as_view(), name='list_hall'),
 ]

@@ -1,6 +1,9 @@
+import random
+
 import factory
 
-from reference_values.models import Genre, Language
+from reference_values.constants import HallTypes
+from reference_values.models import Genre, Hall, Language
 
 
 class LanguageFactory(factory.django.DjangoModelFactory):
@@ -17,3 +20,10 @@ class GenreFactory(factory.django.DjangoModelFactory):
         model = Genre
 
     name = factory.Faker('word')
+
+
+class HallFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Hall
+
+    name = random.choice([el for el in HallTypes])

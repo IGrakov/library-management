@@ -28,3 +28,15 @@ class Genre(TimeStampMixin):
 
     class Meta:
         verbose_name = 'Genre'
+
+
+class Hall(TimeStampMixin):
+    """Model for a library hall"""
+
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Hall'
