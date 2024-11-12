@@ -7,7 +7,8 @@ from faker import Faker
 from django.core.management.base import BaseCommand
 
 from book.models import Author, Book, BookCopy
-from reference_values.models import Genre, Language
+from reference_values.constants import HallTypes
+from reference_values.models import Genre, Language, Hall
 from user import constants
 
 NUM_OF_LIBRARIANS = 2
@@ -89,6 +90,11 @@ class Command(BaseCommand):
 
         for genre in genres:
             Genre.objects.get_or_create(name=genre)
+
+
+        # populate database with halls
+        for hall in HallTypes:
+            Hall.objects.get_or_create(name=hall)
 
 
         # populate database with authors
