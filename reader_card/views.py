@@ -1,5 +1,5 @@
-from drf_spectacular.utils import extend_schema_view, extend_schema
-from rest_framework import status, generics
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import generics, status
 
 from reader_card.models import ReaderCard
 from reader_card.serializers import ReaderCardSerializer

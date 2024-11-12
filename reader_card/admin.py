@@ -16,9 +16,7 @@ class ReaderCardAdmin(admin.ModelAdmin):
     list_display = ('reader__last_name', 'reader__first_name', 'is_suspended', 'photo', 'halls')
     list_filter = ('is_suspended', 'hall_access')
 
-    ordering = (
-        'reader__last_name',
-    )
+    ordering = ('reader__last_name',)
 
     list_per_page = 20
 
