@@ -12,7 +12,7 @@ from book.serializers import (
     BookSerializer,
     BookWriteSerializer,
 )
-from user.permissions import IsAdmin
+from user.permissions import IsAdminOrReadOnly
 
 
 @extend_schema(
@@ -21,7 +21,7 @@ from user.permissions import IsAdmin
 class CreateAuthorView(generics.CreateAPIView):
     """Create new author"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = AuthorSerializer
     queryset = Author.objects.all()
 
@@ -46,7 +46,7 @@ class CreateAuthorView(generics.CreateAPIView):
 class RetrieveUpdateDeleteAuthorView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete author by id"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = AuthorSerializer
     queryset = Author.objects.all()
 
@@ -72,7 +72,7 @@ class ListAuthorView(generics.ListAPIView):
 class CreateBookView(generics.CreateAPIView):
     """Create new book"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = BookSerializer
     queryset = Book.objects.all()
 
@@ -94,7 +94,7 @@ class CreateBookView(generics.CreateAPIView):
 class RetrieveUpdateDeleteBookView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete book by id"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     queryset = Book.objects.all()
 
     def get_serializer_class(self):
@@ -144,7 +144,7 @@ class ListBookView(generics.ListAPIView):
 class CreateBookCopyView(generics.CreateAPIView):
     """Create new book copy"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = BookCopySerializer
     queryset = BookCopy.objects.all()
 
@@ -163,7 +163,7 @@ class CreateBookCopyView(generics.CreateAPIView):
 class RetrieveDeleteBookCopyView(generics.RetrieveDestroyAPIView):
     """Retrieve, update or delete book copy by id"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = BookCopySerializer
     queryset = BookCopy.objects.all()
 
@@ -175,4 +175,6 @@ class ListBookCopyView(generics.ListAPIView):
     """List book copies"""
 
     serializer_class = BookCopySerializer
-    queryset = BookCopy.objects.all()
+    queryset = (
+        BookCopy.objects.all().select_related('book').prefetch_related('book__author', 'book__language', 'book__genre')
+    )

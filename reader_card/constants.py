@@ -1,3 +1,7 @@
 ACCEPTED_PHOTO_FILE_EXTENSIONS = {
-    'pdf',
+    '.pdf',
+    '.png',
+    '.jpg',
+    '.gif',
+    '.tiff',
 }

@@ -10,7 +10,7 @@ class ReaderCard(TimeStampMixin):
 
     reader = models.OneToOneField(User, on_delete=models.CASCADE, related_name='reader_card')
     is_suspended = models.BooleanField(default=False)
-    photo = models.ImageField(upload_to='static/reader_card_photo/', blank=True)
+    photo = models.ImageField(upload_to='reader_card_photos/', blank=True)
     hall_access = models.ManyToManyField(Hall, related_name='reader_cards', blank=True)
 
     def __str__(self):

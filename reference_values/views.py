@@ -7,7 +7,7 @@ from reference_values.serializers import (
     HallSerializer,
     LanguageSerializer,
 )
-from user.permissions import IsAdmin
+from user.permissions import IsAdminOrReadOnly
 
 
 @extend_schema(
@@ -16,7 +16,7 @@ from user.permissions import IsAdmin
 class CreateLanguageView(generics.CreateAPIView):
     """Add new language"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = LanguageSerializer
     queryset = Language.objects.all()
 
@@ -41,7 +41,7 @@ class CreateLanguageView(generics.CreateAPIView):
 class RetrieveUpdateDeleteLanguageView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete language by id"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = LanguageSerializer
     queryset = Language.objects.all()
 
@@ -62,7 +62,7 @@ class ListLanguageView(generics.ListAPIView):
 class CreateGenreView(generics.CreateAPIView):
     """Add new genre"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = GenreSerializer
     queryset = Genre.objects.all()
 
@@ -87,7 +87,7 @@ class CreateGenreView(generics.CreateAPIView):
 class RetrieveUpdateDeleteGenreView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete genre by id"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = GenreSerializer
     queryset = Genre.objects.all()
 
@@ -108,7 +108,7 @@ class ListGenreView(generics.ListAPIView):
 class CreateHallView(generics.CreateAPIView):
     """Add new hall"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = HallSerializer
     queryset = Hall.objects.all()
 
@@ -133,7 +133,7 @@ class CreateHallView(generics.CreateAPIView):
 class RetrieveUpdateDeleteHallView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete hall by id"""
 
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = HallSerializer
     queryset = Hall.objects.all()
 

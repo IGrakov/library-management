@@ -7,9 +7,11 @@ from faker import Faker
 from django.core.management.base import BaseCommand
 
 from book.models import Author, Book, BookCopy
+from reader_card.models import ReaderCard
 from reference_values.constants import HallTypes
 from reference_values.models import Genre, Language, Hall
 from user import constants
+from user.constants import Roles
 
 NUM_OF_LIBRARIANS = 2
 NUM_OF_READERS = 20
@@ -25,7 +27,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        # populate database with user groups
+        # # populate database with user groups
         default_group, _ = Group.objects.get_or_create(name=constants.Roles.READER)
         librarian_group, _ = Group.objects.get_or_create(name=constants.Roles.LIBRARIAN)
 
@@ -95,6 +97,22 @@ class Command(BaseCommand):
         # populate database with halls
         for hall in HallTypes:
             Hall.objects.get_or_create(name=hall)
+
+
+        # populate database with reader cards
+        hall_choices = [1, 1, 2, 2, 2, 3, 4, 5]
+        for reader in user.objects.all():
+            if reader.groups.filter(name=Roles.READER).exists() and not ReaderCard.objects.filter(reader=reader):
+                reader_card, created = ReaderCard.objects.get_or_create(
+                    reader=reader,
+                    photo=fake.file_path()
+                )
+
+                if created:
+                    num_of_halls = random.choice(hall_choices)
+                    for _ in range(num_of_halls):
+                        hall = Hall.objects.order_by('?').first()
+                        reader_card.hall_access.add(hall)
 
 
         # populate database with authors

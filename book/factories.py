@@ -1,4 +1,4 @@
-import random
+from random import randint
 
 import factory
 
@@ -33,7 +33,7 @@ class BookFactory(factory.django.DjangoModelFactory):
         if extracted:
             self.author.add(*extracted)
         else:
-            num_of_authors = random.randint(1, 3)
+            num_of_authors = randint(1, 3)
             self.author.add(*AuthorFactory.create_batch(num_of_authors))
 
     @factory.post_generation
@@ -44,7 +44,7 @@ class BookFactory(factory.django.DjangoModelFactory):
         if extracted:
             self.language.add(*extracted)
         else:
-            num_of_languages = random.randint(1, 3)
+            num_of_languages = randint(1, 3)
             self.language.add(*LanguageFactory.create_batch(num_of_languages))
 
     @factory.post_generation
@@ -55,7 +55,7 @@ class BookFactory(factory.django.DjangoModelFactory):
         if extracted:
             self.genre.add(*extracted)
         else:
-            num_of_genres = random.randint(1, 3)
+            num_of_genres = randint(1, 3)
             self.genre.add(*GenreFactory.create_batch(num_of_genres))
 
 

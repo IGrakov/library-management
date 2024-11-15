@@ -147,6 +147,7 @@ class PrivateBookApiUserAdminTests(TestCase):
             'genre': GenreSerializer(book.genre, many=True).data
         }
         res = self.client.get(reverse('book:manage_book', kwargs={'pk': book.id}))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.json(), expected_data)
 
     def test_delete_book_success(self):
