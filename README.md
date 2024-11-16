@@ -31,3 +31,10 @@ PASSWORD: 'postgres'
 ``poetry run python manage.py test <path_to_specific_test>``\
 e.g.:
 ``poetry run python manage.py test book.tests.tests.PrivateBookApiTests.test_list_books_filtered_success``
+
+10. To run tests with coverage report:\
+``coverage run --source='.' manage.py test``\
+To see test coverage result:\
+``coverage report``\
+or\
+``coverage html``
