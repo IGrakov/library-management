@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -148,7 +150,8 @@ class PrivateUserApiTest(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            res.data, {'first_name': self.user.first_name, 'last_name': self.user.last_name, 'email': self.user.email}
+            res.data,
+            {'id': ANY, 'first_name': self.user.first_name, 'last_name': self.user.last_name, 'email': self.user.email},
         )
 
     def test_post_me_not_allowed(self):
