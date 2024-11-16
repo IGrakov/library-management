@@ -1,22 +1,25 @@
 [tool.poetry]
 name = "library-management"
 version = "0.1.0"
-description = "Test task for DRUM'N'CODE"
+description = "Library management project"
 authors = ["Ivan Grakov"]
 readme = "README.md"
 packages = []
 
 [tool.poetry.dependencies]
 python = "^3.10"
-django = "==5.0"
+django = ">=5.0,<5.1"
 djangorestframework = "^3.15.2"
 django-filter = "^24.3"
 psycopg2-binary = "^2.9.10"
 drf-spectacular = "^0.27.2"
-factory-boy = "^3.3.1"
-django-silk = "^5.3.0"
 pillow = "^11.0.0"
 mock = "^5.1.0"
+
+[tool.poetry.group.dev.dependencies]
+factory-boy = "^3.3.1"
+ddt = "^1.7.2"
+django-silk = "^5.3.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -46,6 +49,31 @@ exclude = '''
   )/
 )
 '''
+
+[tool.coverage.run]
+source = ['.']
+omit = [
+    '*/migrations/*',
+    '*/tests/*',
+    '*/management/*',
+    '*/admin/*',
+    '*/admin.py',
+    '*/apps.py',
+    '*/tests.py',
+    '*/factories.py',
+    'tasks.py',
+    'manage.py',
+]
+
+[tool.coverage.report]
+fail_under = 98
+exclude_lines = [
+    'def __str__',
+    'pragma: no cover',
+    'raise AssertionError',
+    'raise NotImplementedError',
+]
+skip_covered = true
 
 [tool.isort]
 profile = "black"
