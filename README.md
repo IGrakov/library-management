@@ -1,40 +1,49 @@
-# Library Management App
+Library Management System
+----
+Backend - Django + DRF  
+Frontend - Vue3 + Vite +TailwindCSS + PrimeVue
 
-## Local deployment (Ubuntu)
+## To build the entire project
+if you want to rebuild the image from scratch
+```
+docker compose -f docker-compose.dev.yml build --no-cache
+```
+or if you want to keep the cached layers
+```
+docker compose -f docker-compose.dev.yml build
+```
 
-1. Make sure that postgresql service is running on port 5432
+## To build frontend only
+if you want to rebuild the frontend image from scratch
+```
+docker compose -f docker-compose.dev.yml build frontend --no-cache
+```
+or if you want to keep the cached layers
+```
+docker compose -f docker-compose.dev.yml build frontend
+```
 
-2. To check if service is launched, run the following in the terminal:\
-``systemctl status postgresql``
+## To build backend only
+if you want to rebuild the backend image from scratch
+```
+docker compose -f docker-compose.dev.yml build backend --no-cache
+```
+or if you want to keep the cached layers
+```
+docker compose -f docker-compose.dev.yml build backend
+```
 
-3. PostgreSQL database with the following credentials should be created before launching the project:\
-NAME: 'library_management'\
-USER: 'postgres'\
-PASSWORD: 'postgres'
+## To start the project
+```
+docker compose -f docker-compose.dev.yml up
+```
 
-4. Make sure that poetry is installed, otherwise run:\
-``pip install poetry``
+## To remove containers
+```
+docker compose -f docker-compose.dev.yml down
+```
 
-5. Install necessary dependencies specified in pyproject.toml and poetry.lock (you should be in project folder):\
-``poetry install``
-
-6. Run migrations:\
-``poetry run python manage.py migrate``
-
-7. Start dev server\
-``poetry run python manage.py runserver``
-
-8. To run tests:\
-``poetry run python manage.py test``
-
-9. To run a specific test:\
-``poetry run python manage.py test <path_to_specific_test>``\
-e.g.:
-``poetry run python manage.py test book.tests.tests.PrivateBookApiTests.test_list_books_filtered_success``
-
-10. To run tests with coverage report:\
-``coverage run --source='.' manage.py test``\
-To see test coverage result:\
-``coverage report``\
-or\
-``coverage html``
+## To run any manage.py commands, e.g.  python manage.py createsuperuser
+```
+docker compose -f docker-compose.dev.yml exec backend poetry run python manage.py createsuperuser
+```

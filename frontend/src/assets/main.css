@@ -1,0 +1,15 @@
+/* Tailwind base with configuration */
+@import "tailwindcss";
+
+/* PrimeIcons for icons */
+@import "primeicons/primeicons.css";
+
+/* PrimeVue Tailwind plugin */
+@import "tailwindcss-primeui";
+
+/* Configure content sources for Tailwind v4 */
+@source "../../index.html";
+@source "../../src/**/*.{vue,js,ts,jsx,tsx}";
+
+/* Tailwind scrollbar plugin */
+@plugin "tailwind-scrollbar";

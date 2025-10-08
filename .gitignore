@@ -144,8 +144,6 @@ docker/compose/override.yml
 server.crt
 server.key
 
-vagrant/
-
 # Django
 media
 *.tsbuildinfo

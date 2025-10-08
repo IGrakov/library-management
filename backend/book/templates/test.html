@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+{#<body>#}
+{#    <ul>#}
+{#        {% for query in query_list %}#}
+{#            <li>Book copy: {{ query.id }} of {{ query.book.title }} with uid={{ query.uid }}</li>#}
+{#            <ul>#}
+{#                {% for auth in query.book.author.all %}#}
+{#                    <li>{{ auth }}</li>#}
+{#                {% endfor %}#}
+{#            </ul>#}
+{#        {% endfor %}#}
+{#    </ul>#}
+{##}
+{#</body>#}
+<body>
+    <ul>
+        {% for author in authors %}
+            <li>
+                {{ author.last_name }}, {{ author.first_name }} | total number of books: {{ author.num_of_books }} | total number of copies: {{ author.num_of_copies }}
+                <ul>
+                    {% for book in author.books.all %}
+                        <li>
+                            {{ book.title }} | copies: {{ book.copies.count }}
+                            <ol>
+                                {% for book_copy in book.copies.all %}
+                                    <li>
+                                        {{ book_copy.uid }}
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
