@@ -135,7 +135,11 @@ class RetrieveUpdateDeleteBookView(generics.RetrieveUpdateDestroyAPIView):
 class ListBookView(generics.ListAPIView):
     """List books"""
 
-    queryset = Book.objects.all().prefetch_related('author', 'language', 'genre')
+    queryset = (
+        Book.objects
+        .prefetch_related('author', 'language', 'genre')
+        .annotate(copies_count=Count('copies'))
+    )
     serializer_class = BookSerializer
     pagination_class = ResultSetPagination
     filter_backends = (filters.DjangoFilterBackend,)
@@ -180,7 +184,7 @@ class ListBookCopyView(generics.ListAPIView):
 
     serializer_class = BookCopySerializer
     queryset = (
-        BookCopy.objects.select_related('book').all().prefetch_related('book__author', 'book__language', 'book__genre')
+        BookCopy.objects.select_related('book').prefetch_related('book__author', 'book__language', 'book__genre')
     )
 
 
@@ -192,7 +196,7 @@ def testView(request):
     # authors = Author.objects.all().order_by('last_name')
     # authors = Author.objects.prefetch_related('books', 'books__copies')
     # authors = Author.objects.annotate(num_of_copies=Count('books__copies')).aggregate(num_of_books=Sum(F('num_of_copies')))
-    authors = Author.objects.all().prefetch_related('books', 'books__copies').annotate(
+    authors = Author.objects.prefetch_related('books', 'books__copies').annotate(
         num_of_copies=Count('books'),
         num_of_books=Count('books__copies')
     )

@@ -23,6 +23,7 @@ class BookSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(many=True, read_only=True)
     language = LanguageSerializer(many=True, read_only=True)
     genre = GenreSerializer(many=True, read_only=True)
+    copies_count = serializers.IntegerField(source='copies.count', read_only=True)
 
     class Meta:
         model = Book
@@ -37,6 +38,7 @@ class BookSerializer(serializers.ModelSerializer):
             'cover',
             'language',
             'genre',
+            'copies_count',
         ]
 
 
@@ -68,7 +70,7 @@ class BookWriteSerializer(serializers.ModelSerializer):
                 instance.language.add(language)
         for genre_id in genre_ids:
             genre = Genre.objects.filter(id=genre_id).first()
-            # Ignore if language id in payload is invalid
+            # Ignore if genre id in payload is invalid
             if genre:
                 instance.genre.add(genre)
 
