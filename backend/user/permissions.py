@@ -11,11 +11,15 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         ):
             return True
 
+        return False
+
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.is_authenticated and request.user.groups.filter(name=constants.Roles.ADMIN).exists():
             return True
+
+        return False
 
 
 class IsLibrarianOrReadOnly(permissions.BasePermission):
@@ -26,8 +30,12 @@ class IsLibrarianOrReadOnly(permissions.BasePermission):
         ):
             return True
 
+        return False
+
 
 class IsLibrarian(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.is_authenticated and request.user.groups.filter(name=constants.Roles.LIBRARIAN).exists():
             return True
+
+        return False
