@@ -13,5 +13,9 @@ class ReaderCard(TimeStampMixin):
     photo = models.ImageField(upload_to='reader_card_photos/', blank=True)
     hall_access = models.ManyToManyField(Hall, related_name='reader_cards', blank=True)
 
+    @property
+    def active_loans(self):
+        return self.book_loans.filter(returned_at__isnull=True)
+
     def __str__(self):
         return f'{self.reader.last_name} {self.reader.first_name}'

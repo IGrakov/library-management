@@ -1,9 +1,11 @@
 import uuid
 
 from django.db import models
+from django.db.models import Q, UniqueConstraint
 
 from core.models import TimeStampMixin
-from reference_values.models import Genre, Language
+from reader_card.models import ReaderCard
+from reference_values.models import Genre, Hall, Language
 
 
 class Author(TimeStampMixin):
@@ -60,6 +62,11 @@ class BookCopy(TimeStampMixin):
 
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='copies')
     uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    hall = models.ForeignKey(Hall, on_delete=models.SET_NULL, null=True, blank=True)
+
+    @property
+    def is_available(self):
+        return not self.book_loans.filter(returned_at__isnull=True).exists()
 
     def __str__(self):
         return f'Copy of book with ISBN {self.book.isbn} with uid {self.uid}'
@@ -67,3 +74,33 @@ class BookCopy(TimeStampMixin):
     class Meta:
         verbose_name = 'Book copy'
         verbose_name_plural = 'Book copies'
+
+
+class BookLoan(TimeStampMixin):
+    """Model for a book loan"""
+
+    book_copy = models.ForeignKey(
+        BookCopy,
+        on_delete=models.CASCADE,
+        related_name='book_loans'
+    )
+    reader_card = models.ForeignKey(
+        ReaderCard,
+        on_delete=models.CASCADE,
+        related_name='book_loans'
+    )
+
+    borrowed_at = models.DateTimeField(auto_now_add=True)
+    due_date = models.DateTimeField()
+    returned_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Book loan'
+
+        constraints = [
+            UniqueConstraint(
+                fields=['book_copy'],
+                condition=Q(returned_at__isnull=True),
+                name='unique_active_loan_per_copy'
+            )
+        ]
