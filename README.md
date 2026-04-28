@@ -1,7 +1,7 @@
 Library Management System
 ----
 Backend - Django + DRF  
-Frontend - Vue3 + Vite +TailwindCSS + PrimeVue
+Frontend - Vue3 + Vite + TailwindCSS + PrimeVue
 
 ## To build the entire project
 if you want to rebuild the image from scratch
