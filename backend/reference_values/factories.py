@@ -26,4 +26,4 @@ class HallFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Hall
 
-    name = random.choice([el for el in HallTypes])  # noqa C416
+    name = factory.LazyFunction(lambda: random.choice([el for el in HallTypes]))  # noqa C416
