@@ -41,7 +41,21 @@ class IsLibrarian(permissions.BasePermission):
         return False
 
 
-class IsSelfOrLibrarianOrAdmin(permissions.BasePermission):
+class IsSelfOrLibrarian(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if not request.user.is_authenticated:
+            return False
+
+        if request.user.is_superuser:
+            return True
+
+        if request.user.groups.filter(name=constants.Roles.LIBRARIAN).exists():
+            return True
+
+        return obj == request.user
+
+
+class IsLibrarianOrAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if not request.user.is_authenticated:
             return False
@@ -54,5 +68,3 @@ class IsSelfOrLibrarianOrAdmin(permissions.BasePermission):
 
         if request.user.groups.filter(name=constants.Roles.LIBRARIAN).exists():
             return True
-
-        return obj == request.user

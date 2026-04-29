@@ -7,14 +7,18 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
 from .models import User
+from .permissions import IsLibrarian, IsSelfOrLibrarian, IsLibrarianOrAdmin
 from .serializers import AuthTokenSerializer, UserSerializer
 
 
 class CreateUserView(generics.CreateAPIView):
-    """Create a new user in the system"""
+    """
+    Create a new user in the system.
+    Permitted only to admins to create librarians and to librarians to create readers
+    """
 
     serializer_class = UserSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsLibrarianOrAdmin,)
 
 
 class CreateTokenView(ObtainAuthToken):
@@ -44,17 +48,19 @@ class CreateTokenView(ObtainAuthToken):
     ),
 )
 class ManageUserView(generics.RetrieveUpdateAPIView):
-    """Manage authenticated user"""
+    """Manage authenticated user. Permitted only to self or librarians"""
 
     serializer_class = UserSerializer
+    permission_classes = (IsSelfOrLibrarian,)
 
     def get_object(self):
         """Retrieve and return authenticated user"""
-        return self.request.user
+        return self.request.user if not self.kwargs.get('pk') else User.objects.get(pk=self.kwargs['pk'])
 
 
 class ListUserView(generics.ListAPIView):
-    """List users in the system"""
+    """List users in the system. Permitted only to librarians"""
 
     serializer_class = UserSerializer
+    permission_classes = (IsLibrarian,)
     queryset = User.objects.all()
