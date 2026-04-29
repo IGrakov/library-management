@@ -20,6 +20,9 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self.db)
 
+        default_group, _ = Group.objects.get_or_create(name=constants.Roles.READER)
+        user.groups.add(default_group)
+
         return user
 
     def create_superuser(self, email, password):
@@ -27,9 +30,11 @@ class UserManager(BaseUserManager):
         user = self.create_user(email, password)
         user.is_staff = True
         user.is_superuser = True
-        admin_group, _ = Group.objects.get_or_create(name=constants.Roles.ADMIN)
-        admin_group.user_set.add(user)
         user.save(using=self.db)
+
+        admin_group, _ = Group.objects.get_or_create(name=constants.Roles.ADMIN)
+        user.groups.clear()
+        user.groups.add(admin_group)
 
         return user
 

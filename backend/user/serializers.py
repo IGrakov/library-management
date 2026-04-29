@@ -45,11 +45,13 @@ class UserSerializer(serializers.ModelSerializer):
 
         user = get_user_model().objects.create_user(**validated_data)
 
-        group = Group.objects.get(name=role)
-        user.groups.add(group)
+        if role:
+            group = Group.objects.get(name=role)
+            user.groups.clear()
+            user.groups.add(group)
 
-        if role == constants.Roles.LIBRARIAN:
-            user.is_staff = True
+            if role == constants.Roles.LIBRARIAN:
+                user.is_staff = True
 
         user.save()
 
