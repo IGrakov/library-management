@@ -1,13 +1,29 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.utils.translation import gettext_lazy as _
 
 # Register your models here.
 from user.models import User
 
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('email',)
+
+
+class CustomUserChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ('email', 'first_name', 'last_name', 'is_active', 'is_staff')
+
 
 @admin.register(User)
-class UserAdmin(UserAdmin):
+class UserAdmin(BaseUserAdmin):
+    add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
+    model = User
+
     @admin.display(description='Groups')
     def group(self, user):
         groups = []
@@ -16,12 +32,11 @@ class UserAdmin(UserAdmin):
         return ', '.join(groups)
 
     fieldsets = (
-        (None, {'fields': ('password',)}),
+        (None, {'fields': ('email', 'password',)}),
         (
             _('Personal info'),
             {
                 'fields': (
-                    'email',
                     'last_name',
                     'first_name',
                 )
@@ -40,6 +55,19 @@ class UserAdmin(UserAdmin):
             },
         ),
         (_('Important dates'), {'fields': ('last_login',)}),
+    )
+
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': (
+                'email',
+                'password1',
+                'password2',
+                'is_staff',
+                'is_superuser',
+            ),
+        }),
     )
 
     list_display = (
