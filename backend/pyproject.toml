@@ -33,6 +33,10 @@ coverage = {extras = ["toml"], version = "^7.6.7"}
 django-silk = "^5.5.0"
 pre-commit = "^4.6.0"
 
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "library_management.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+
 [tool.black]
 line-length = 120
 target-version = ['py313']
