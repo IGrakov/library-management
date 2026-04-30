@@ -1,3 +1,4 @@
+from django.db.models import Q
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
@@ -6,8 +7,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
+from . import constants
 from .models import User
-from .permissions import IsLibrarian, IsSelfOrLibrarian, IsLibrarianOrAdmin
+from .permissions import CanCreateOrManageUser, IsLibrarianOrAdmin, get_user_role_rank
 from .serializers import AuthTokenSerializer, UserSerializer
 
 
@@ -18,7 +20,7 @@ class CreateUserView(generics.CreateAPIView):
     """
 
     serializer_class = UserSerializer
-    permission_classes = (IsLibrarianOrAdmin,)
+    permission_classes = (CanCreateOrManageUser,)
 
 
 class CreateTokenView(ObtainAuthToken):
@@ -51,16 +53,50 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     """Manage authenticated user. Permitted only to self or librarians"""
 
     serializer_class = UserSerializer
-    permission_classes = (IsSelfOrLibrarian,)
+    permission_classes = (CanCreateOrManageUser,)
 
     def get_object(self):
         """Retrieve and return authenticated user"""
-        return self.request.user if not self.kwargs.get('pk') else User.objects.get(pk=self.kwargs['pk'])
+        pk = self.kwargs.get("pk")
+
+        obj = self.request.user if pk is None else User.objects.get(pk=pk)
+
+        self.check_object_permissions(self.request, obj)
+        return obj
 
 
 class ListUserView(generics.ListAPIView):
     """List users in the system. Permitted only to librarians"""
 
     serializer_class = UserSerializer
-    permission_classes = (IsLibrarian,)
-    queryset = User.objects.all()
+    permission_classes = (IsLibrarianOrAdmin,)
+
+    def get_queryset(self):
+        user = self.request.user
+
+        # Superuser sees everything
+        if user.is_superuser:
+            return User.objects.all()
+
+        # Admin / Librarian see only lower-ranked active users
+        actor_rank = get_user_role_rank(user)
+
+        return User.objects.filter(
+            is_active=True
+        ).filter(
+            self._lower_rank_q(actor_rank)
+        )
+
+    def _lower_rank_q(self, actor_rank):
+        if actor_rank == constants.ADMIN_USER_RANK:
+            # admin sees librarians + readers
+            return (
+                Q(groups__name=constants.Roles.LIBRARIAN) |
+                Q(groups__name=constants.Roles.READER)
+            )
+
+        if actor_rank == constants.LIBRARIAN_USER_RANK:
+            # librarian sees only readers
+            return Q(groups__name=constants.Roles.READER)
+
+        return Q(pk=None)  # readers see nothing

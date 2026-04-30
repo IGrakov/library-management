@@ -2,11 +2,34 @@ from rest_framework import permissions
 
 from user import constants
 
+def get_user_role_rank(user):
+    if not user.is_active:
+        return constants.INACTIVE_USER_RANK  # disabled user has no rights
 
-class IsAdminOrReadOnly(permissions.BasePermission):
+    if user.is_superuser:
+        return constants.SUPER_USER_RANK  # should be the highest rank
+
+    if user.groups.filter(name=constants.Roles.ADMIN).exists():
+        return constants.ADMIN_USER_RANK
+
+    if user.groups.filter(name=constants.Roles.LIBRARIAN).exists():
+        return constants.LIBRARIAN_USER_RANK
+
+    return constants.READER_USER_RANK
+
+
+class IsAuthenticatedAndActive(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.user.is_authenticated and (
-            request.method in permissions.SAFE_METHODS
+        return request.user and request.user.is_authenticated and request.user.is_active
+
+
+class IsAdmin(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated or not request.user.is_active:
+            return False
+
+        if (
+            request.user.is_superuser
             or request.user.groups.filter(name=constants.Roles.ADMIN).exists()
         ):
             return True
@@ -14,19 +37,15 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         return False
 
 
-class IsAdmin(permissions.BasePermission):
+class IsAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.user.is_authenticated and request.user.groups.filter(name=constants.Roles.ADMIN).exists():
-            return True
+        if not request.user.is_authenticated or not request.user.is_active:
+            return False
 
-        return False
-
-
-class IsLibrarianOrReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if request.user.is_authenticated and (
-            request.method in permissions.SAFE_METHODS
-            or request.user.groups.filter(name=constants.Roles.LIBRARIAN).exists()
+        if (
+            request.user.is_superuser
+            or request.user.groups.filter(name=constants.Roles.ADMIN).exists()
+            or request.method in permissions.SAFE_METHODS
         ):
             return True
 
@@ -35,36 +54,58 @@ class IsLibrarianOrReadOnly(permissions.BasePermission):
 
 class IsLibrarian(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.user.is_authenticated and request.user.groups.filter(name=constants.Roles.LIBRARIAN).exists():
+        if (
+            request.user.is_authenticated
+            and request.user.is_active
+            and request.user.groups.filter(name=constants.Roles.LIBRARIAN).exists()
+        ):
             return True
 
         return False
 
 
-class IsSelfOrLibrarian(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if not request.user.is_authenticated:
-            return False
-
-        if request.user.is_superuser:
-            return True
-
-        if request.user.groups.filter(name=constants.Roles.LIBRARIAN).exists():
-            return True
-
-        return obj == request.user
-
-
 class IsLibrarianOrAdmin(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if not request.user.is_authenticated:
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated or not request.user.is_active:
             return False
 
         if request.user.is_superuser:
             return True
 
-        if request.user.groups.filter(name=constants.Roles.ADMIN).exists():
+        return request.user.groups.filter(
+            name__in={constants.Roles.ADMIN, constants.Roles.LIBRARIAN}
+        ).exists()
+
+
+class CanCreateOrManageUser(IsAuthenticatedAndActive):
+
+    def has_object_permission(self, request, view, obj):
+        actor = request.user
+
+        # any actor despite his rank must be active
+        if not actor.is_active:
+            return False
+
+        # no one, even superuser, can perform any actions with superuser
+        if obj.is_superuser:
+            return False
+
+        # superuser override and can perform actions with deleted (not active) users
+        if actor.is_superuser:
             return True
 
-        if request.user.groups.filter(name=constants.Roles.LIBRARIAN).exists():
+        # cannot interact with inactive targets
+        if not obj.is_active:
+            return False
+
+        # self access always allowed
+        if obj == actor:
             return True
+
+        actor_rank = get_user_role_rank(actor)
+        target_rank = get_user_role_rank(obj)
+
+        # only higher rank user can manage lower rank user, i.e.
+        # admin cannot manage another admin
+        # librarian cannot manage another librarian
+        return actor_rank > target_rank

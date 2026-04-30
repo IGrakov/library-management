@@ -4,12 +4,13 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from user import constants
+from user.permissions import get_user_role_rank
 
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the users object"""
     role = serializers.ChoiceField(
-        choices=[constants.Roles.READER, constants.Roles.LIBRARIAN],
+        choices=[constants.Roles.READER, constants.Roles.LIBRARIAN, constants.Roles.ADMIN],
         write_only=True
     )
 
@@ -33,12 +34,12 @@ class UserSerializer(serializers.ModelSerializer):
         creator = request.user
 
         if role == constants.Roles.LIBRARIAN:
-            if not creator.groups.filter(name=constants.Roles.ADMIN).exists():
+            if get_user_role_rank(creator) < constants.ADMIN_USER_RANK:
                 raise serializers.ValidationError("Only admin can create librarian")
 
         elif role == constants.Roles.READER:
-            if not creator.groups.filter(name=constants.Roles.LIBRARIAN).exists():
-                raise serializers.ValidationError("Only librarian can create regular users")
+            if get_user_role_rank(creator) < constants.LIBRARIAN_USER_RANK:
+                raise serializers.ValidationError("Only librarian or admin can create regular users")
 
         else:
             raise serializers.ValidationError("Invalid role")
@@ -50,7 +51,7 @@ class UserSerializer(serializers.ModelSerializer):
             user.groups.clear()
             user.groups.add(group)
 
-            if role == constants.Roles.LIBRARIAN:
+            if role in {constants.Roles.LIBRARIAN, constants.Roles.ADMIN}:
                 user.is_staff = True
 
         user.save()
