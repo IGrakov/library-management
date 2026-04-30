@@ -1,173 +1,86 @@
+import pytest
 from unittest.mock import ANY
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APIClient
 
 from user import constants
 from user.factories import UserFactory
 
-CREATE_USER_URL = reverse('user:create')
+USER_CREATE_URL = reverse('user:create')
 TOKEN_URL = reverse('user:token')
-ME_URL = reverse('user:me')
+USER_MANAGE_URL = reverse('user:manage')
+USER_LIST_URL = reverse('user:list')
+USER_MANAGE_URL_WITH_ID= '/api/user/manage/1/'
 
-TEST_FIRST_NAME = 'Test first name'
-TEST_LAST_NAME = 'Test last name'
-TEST_EMAIL = 'test@test.com'
+pytestmark = pytest.mark.django_db
 
+def test_user_assigned_reader_group_by_default(user_create_payload):
+    user = get_user_model().objects.create_user(**user_create_payload)
 
-class UserRoleByDefaultTests(TestCase):
-    """Test assignment of user roles by default"""
-
-    def test_user_is_assigned__at_creation_to_reader_group_by_default(self):
-        payload = {
-            'email': TEST_EMAIL,
-            'password': 'testpassword',
-            'first_name': TEST_FIRST_NAME,
-            'last_name': TEST_LAST_NAME,
-        }
-        user = get_user_model().objects.create_user(**payload)
-        self.assertTrue(user.groups.filter(name=constants.Roles.READER).exists())
-
-    def test_superuser_is_assigned__at_creation_to_admin_group_by_default(self):
-        superuser = get_user_model().objects.create_superuser(email=TEST_EMAIL, password='testpassword')
-        self.assertTrue(superuser.groups.filter(name=constants.Roles.ADMIN).exists())
+    assert user.groups.filter(name=constants.Roles.READER).exists()
 
 
-class PublicUserApiTests(TestCase):
-    """Test the users API (public)"""
+def test_superuser_assigned_admin_group_by_default(user_create_payload):
+    user_create_payload.pop('first_name')
+    user_create_payload.pop('last_name')
+    user = get_user_model().objects.create_superuser(**user_create_payload)
 
-    def test_create_valid_user_success(self):
-        """Test create user with valid payload is successful"""
-        payload = {
-            'email': TEST_EMAIL,
-            'password': 'testpassword',
-            'first_name': TEST_FIRST_NAME,
-            'last_name': TEST_LAST_NAME,
-        }
-        res = self.client.post(CREATE_USER_URL, payload)
-
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        user = get_user_model().objects.get(**res.data)
-        self.assertTrue(user.check_password(payload['password']))
-        self.assertNotIn('password', res.data)
-
-    def test_user_exists(self):
-        """Test creating user that already exists fails"""
-        payload = {
-            'email': TEST_EMAIL,
-            'password': 'testpassword',
-            'first_name': TEST_FIRST_NAME,
-            'last_name': TEST_LAST_NAME,
-        }
-        UserFactory(**payload)
-
-        res = self.client.post(CREATE_USER_URL, payload)
-
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_password_too_short(self):
-        """Test that password must be more than 5 characters"""
-        payload = {'email': TEST_EMAIL, 'password': 'pw', 'first_name': TEST_FIRST_NAME, 'last_name': TEST_LAST_NAME}
-        res = self.client.post(CREATE_USER_URL, payload)
-
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-        user_exists = get_user_model().objects.filter(email=payload['email']).exists()
-        self.assertFalse(user_exists)
-
-    def test_create_token_for_user(self):
-        """Test that a token is created for user"""
-        user_details = {
-            'first_name': TEST_FIRST_NAME,
-            'last_name': TEST_LAST_NAME,
-            'email': TEST_EMAIL,
-            'password': 'test-user-pass123',
-        }
-        UserFactory(**user_details)
-
-        payload = {'email': user_details['email'], 'password': user_details['password']}
-        res = self.client.post(TOKEN_URL, payload)
-
-        self.assertIn('token', res.data)
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-
-    def test_create_token_invalid_creds(self):
-        """Test that token is not create if invalid creds are given"""
-        UserFactory(email=TEST_EMAIL, password='validpass')
-        payload = {
-            'email': TEST_EMAIL,
-            'password': 'invalidpass',
-        }
-        res = self.client.post(TOKEN_URL, payload)
-
-        self.assertNotIn('token', res.data)
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_create_token_no_user(self):
-        """Test that token is not created if user does not exist"""
-        payload = {
-            'email': TEST_EMAIL,
-            'password': 'testpassword',
-        }
-        res = self.client.post(TOKEN_URL, payload)
-
-        self.assertNotIn('token', res.data)
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_create_token_blank_password(self):
-        """Test that email and password are required"""
-        payload = {
-            'email': TEST_EMAIL,
-            'password': '',
-        }
-        res = self.client.post(TOKEN_URL, payload)
-
-        self.assertNotIn('token', res.data)
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_retrieve_user_unauthorized(self):
-        """Test that authentication is required for users"""
-        res = self.client.get(ME_URL)
-
-        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+    assert user.groups.filter(name=constants.Roles.ADMIN).exists()
 
 
-class PrivateUserApiTest(TestCase):
-    """Test API requests that require authentication"""
+@pytest.mark.parametrize(
+    ('url', 'method', 'payload'),
+    (
+        (USER_LIST_URL, 'get', {}),
+        (USER_CREATE_URL, 'post', {'data': {}}),
+        (USER_MANAGE_URL, 'get', {}),
+        (USER_MANAGE_URL, 'put', {'data': {}}),
+        (USER_MANAGE_URL, 'patch', {'data': {}}),
+        (USER_MANAGE_URL_WITH_ID, 'get', {}),
+        (USER_MANAGE_URL_WITH_ID, 'put', {'data': {}}),
+        (USER_MANAGE_URL_WITH_ID, 'patch', {'data': {}}),
+    ),
+)
+def test_user_endpoints_require_authentication(
+    api_client,
+    url,
+    method,
+    payload,
+):
+    response = getattr(api_client, method)(url, **payload)
 
-    def setUp(self) -> None:
-        self.user = UserFactory(
-            email=TEST_EMAIL, password='testpass', first_name=TEST_FIRST_NAME, last_name=TEST_LAST_NAME
-        )
-        self.client = APIClient()
-        self.client.force_authenticate(user=self.user)
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_retrieve_profile_success(self):
-        """Test retrieving profile for logged in user"""
-        res = self.client.get(ME_URL)
 
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            res.data,
-            {'id': ANY, 'first_name': self.user.first_name, 'last_name': self.user.last_name, 'email': self.user.email},
-        )
+def test_reader_user_not_allowed_to_list_users(auth_client, reader_user):
+    response = auth_client(reader_user).get(USER_LIST_URL)
 
-    def test_post_me_not_allowed(self):
-        """Test that POST is not allowed on me url"""
-        res = self.client.post(ME_URL, {})
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
-        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def test_update_user_profile(self):
-        """Test updating profile for authenticated user"""
-        payload = {'first_name': 'New first name', 'last_name': 'New last name', 'password': 'newpassword123'}
+@pytest.mark.parametrize(
+    ('user_fixture', 'num_of_returned_records'),
+    (
+        ('super_user', 4),
+        ('admin_user', 2),
+        ('librarian_user', 1),
+    ),
+)
+def test_admin_user_and_librarian_user_can_list_users_with_respective_role_ranks(
+    user_fixture,
+    request,
+    auth_client,
+    num_of_returned_records
+):
+    user = request.getfixturevalue(user_fixture)
 
-        res = self.client.patch(ME_URL, payload)
+    UserFactory.create()
+    UserFactory.create(role=constants.Roles.LIBRARIAN)
+    UserFactory.create(role=constants.Roles.ADMIN)
 
-        self.user.refresh_from_db()
-        self.assertEqual(self.user.first_name, payload['first_name'])
-        self.assertEqual(self.user.last_name, payload['last_name'])
-        self.assertTrue(self.user.check_password(payload['password']))
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+    response = auth_client(user).get(USER_LIST_URL)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.json()) == num_of_returned_records
