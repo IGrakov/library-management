@@ -1,0 +1,12 @@
+node_modules/
+.pnpm-store/
+dist/
+.vite/
+coverage/
+
+.git/
+.idea/
+.vscode/
+
+.env
+.env.*

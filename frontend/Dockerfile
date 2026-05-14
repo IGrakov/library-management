@@ -1,22 +1,20 @@
-FROM node:23-slim
+FROM node:24-alpine AS dev
 
-# Install pnpm globally
-RUN npm install -g pnpm
+# Enable pnpm via corepack
+RUN corepack enable
 
 WORKDIR /app
 
 # Copy package.json and pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN echo -e "allowBuilds:\n  vue-demi: true" > pnpm-workspace.yaml
+
+RUN corepack enable \
+ && pnpm install --frozen-lockfile
 
 # Copy project files
 COPY . .
-
-# Change ownership to the existing node user
-RUN chown -R node:node /app
-USER node
 
 # Expose dev server port
 EXPOSE 5173
