@@ -1,0 +1,41 @@
+# ========================================
+# .prettierignore
+# ========================================
+
+# === 1. System & dependencies ===
+node_modules
+.pnpm-store
+dist
+build
+coverage
+.env
+*.log
+*.zip
+
+# === 2. Project configuration ===
+.prettierignore
+.prettierrc
+eslint.config.js
+postcss.config.cjs
+vite.config.js
+tsconfig.json
+tsconfig.node.json
+package.json
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# === 3. IDE & OS files ===
+.idea
+.vscode
+.DS_Store
+
+# === 4. Generated / declaration files ===
+**/*.d.ts
+**/types/**/*.d.ts
+
+# === 5. Static assets (not formatted) ===
+src/assets/
+
+# === 6. Misc / temporary ===
+# (Add custom local ignores here if needed)

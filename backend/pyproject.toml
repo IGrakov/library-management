@@ -7,61 +7,108 @@ readme = "README.md"
 packages = []
 
 [tool.poetry.dependencies]
-python = "^3.13"
-django = ">=6.0.4,<6.1"
-djangorestframework = "^3.17.1"
-django-filter = "^25.2"
-psycopg = "^3.3.3"
-gunicorn = "^25.3.0"
-django-cors-headers = "^4.9.0"
-drf-spectacular = "^0.29.0"
-pillow = "^12.2.0"
-redis = "^7.4.0"
-django-redis = "^6.0.0"
+python = "^3.14"
 celery = "^5.6.3"
-flower = "^2.0.1"
-django-celery-results = "^2.6.0"
+django = ">=6.0.4,<6.1"
 django-celery-beat = "^2.9.0"
+django-celery-results = "^2.6.0"
+django-cors-headers = "^4.9.0,<5.0.0"
+django-filter = "^25.2"
+django-redis = "^6.0.0"
+djangorestframework = "^3.17.1"
+djangorestframework-simplejwt = "^5.5.1,<6.0.0"
+drf-spectacular = "^0.29.0"
+environs = {extras = ["django"], version = "^15.0.1"}
+flower = "^2.0.1"
+gunicorn = "^25.3.0"
+pillow = "^12.2.0"
+psycopg = "^3.3.3"
+redis = "^7.4.0"
+whitenoise = "^6.12.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^9.0.3"
-pytest-django = "^4.12.0"
-pytest-cov = "^7.1.0"
-pytest-mock = "^3.15.1"
-factory-boy = "^3.3.3"
 coverage = {extras = ["toml"], version = "^7.6.7"}
 django-silk = "^5.5.0"
+factory-boy = "^3.3.3"
 pre-commit = "^4.6.0"
+pytest = "^9.0.3"
+pytest-cov = "^7.1.0"
+pytest-django = "^4.12.0"
+pytest-mock = "^3.15.1"
+ruff = "^0.15.12"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "library_management.settings"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 
-[tool.black]
+# -----------------------------
+# Ruff configuration
+# -----------------------------
+[tool.ruff]
 line-length = 120
-target-version = ['py313']
-include = '\.pyi?$'
-skip-string-normalization = true
-exclude = '''
-(
-  /(
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-    | htmlcov
-    | k8s
-    | frontend
-    | docker
-  )/
-)
-'''
+target-version = "py314"
+
+exclude = [
+    ".git",
+    "__pycache__",
+    "**/migrations/*",
+    ".venv",
+    "**/manage.py"
+]
+
+[tool.ruff.lint]
+select = [
+    "A",    # flake8-builtins
+    "ANN",  # flake8-annotations
+    "ARG",  # flake8-unused-arguments
+    "ASYNC",# flake8-async
+    "B",    # flake8-bugbear
+    "BLE",  # blind exceptions
+    "C4",   # flake8-comprehensions
+    "COM",  # flake8-commas
+    "DJ",   # flake8-django
+    "DTZ",  # flake8-datetimez
+    "E",    # pycodestyle
+    "EM",   # format exception messages
+    "ERA",  # commented code
+    "F",    # pyflakes
+    "FAST", # fastAPI
+    "FLY",  # expression instead of string join
+    "I",    # imports
+    "N",    # pep8 naming
+    "PERF", # perflint
+    "PLC",  # errors
+    "PLR",  # refactor
+    "PLW",  # warnings
+    "PTH",  # flake8-use-pathlib
+    "PIE",  # flake8-pie
+    "Q",    # flake8-quotes
+    "RET",  # flake8-return
+    "RUF",  # ruff
+    "S",    # flake8-bandit
+    "SIM",  # flake8-simplify
+    "T10",  # flake8-debugger
+    "T20",  # flake8-print
+    "TRY",  # tryceratops
+    "W",    # warnings
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+"**/views.py" = ["ANN201"]
+"**/settings.py" = ["E501"]
+"**/conftest.py" = ["ANN", "PLR0913", "S105", "S106", "S311"]
+"**/test_*.py" = ["ANN", "PLR2004", "S101", "S105", "S311", "PLR0913"]
+"**/factories.py" = ["S105"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = 120
+
 
 [tool.coverage.run]
 source = ['.']
@@ -80,6 +127,7 @@ omit = [
     'wsgi.py'
 ]
 
+
 [tool.coverage.report]
 fail_under = 90
 exclude_lines = [
@@ -89,15 +137,3 @@ exclude_lines = [
     'raise NotImplementedError',
 ]
 skip_covered = true
-
-[tool.isort]
-profile = "black"
-
-[tool.mypy]
-python_version = "3.13"
-plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
-
-[tool.ruff.flake8-quotes]
-docstring-quotes = "double"
-inline-quotes = "single"
-multiline-quotes = "single"

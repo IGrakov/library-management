@@ -1,5 +1,0 @@
-[flake8]
-ignore = W503,E800,DJ01
-max-line-length = 120
-exclude = tests/*,*migrations*,tasks.py
-max-complexity = 6
