@@ -10,8 +10,7 @@ COPY package.json pnpm-lock.yaml ./
 
 RUN echo -e "allowBuilds:\n  vue-demi: true" > pnpm-workspace.yaml
 
-RUN corepack enable \
- && pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # Copy project files
 COPY . .
