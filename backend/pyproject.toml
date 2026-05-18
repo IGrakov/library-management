@@ -99,6 +99,7 @@ select = [
 "**/settings.py" = ["E501"]
 "**/conftest.py" = ["ANN", "PLR0913", "S105", "S106", "S311"]
 "**/test_*.py" = ["ANN", "PLR2004", "S101", "S105", "S311", "PLR0913"]
+"**/tests.py" = ["ANN", "PLR2004", "S101", "S105", "S311", "PLR0913"]
 "**/factories.py" = ["S105"]
 
 [tool.ruff.format]
@@ -108,7 +109,6 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 docstring-code-format = true
 docstring-code-line-length = 120
-
 
 [tool.coverage.run]
 source = ['.']
