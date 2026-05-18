@@ -11,7 +11,7 @@ from user.permissions import IsAdminOrReadOnly
 
 
 @extend_schema(
-    tags=['language'],
+    tags=["language"],
 )
 class CreateLanguageView(generics.CreateAPIView):
     """Add new language"""
@@ -23,20 +23,20 @@ class CreateLanguageView(generics.CreateAPIView):
 
 @extend_schema_view(
     get=extend_schema(
-        description='Retrieve language by id',
+        description="Retrieve language by id",
     ),
     put=extend_schema(
-        description='Update language by id',
+        description="Update language by id",
     ),
     patch=extend_schema(
-        description='Partially update language by id',
+        description="Partially update language by id",
     ),
     delete=extend_schema(
-        description='Delete language by id',
+        description="Delete language by id",
     ),
 )
 @extend_schema(
-    tags=['language'],
+    tags=["language"],
 )
 class RetrieveUpdateDeleteLanguageView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete language by id"""
@@ -47,7 +47,7 @@ class RetrieveUpdateDeleteLanguageView(generics.RetrieveUpdateDestroyAPIView):
 
 
 @extend_schema(
-    tags=['language'],
+    tags=["language"],
 )
 class ListLanguageView(generics.ListAPIView):
     """List languages"""
@@ -57,7 +57,7 @@ class ListLanguageView(generics.ListAPIView):
 
 
 @extend_schema(
-    tags=['genre'],
+    tags=["genre"],
 )
 class CreateGenreView(generics.CreateAPIView):
     """Add new genre"""
@@ -69,20 +69,20 @@ class CreateGenreView(generics.CreateAPIView):
 
 @extend_schema_view(
     get=extend_schema(
-        description='Retrieve genre by id',
+        description="Retrieve genre by id",
     ),
     put=extend_schema(
-        description='Update genre by id',
+        description="Update genre by id",
     ),
     patch=extend_schema(
-        description='Partially update genre by id',
+        description="Partially update genre by id",
     ),
     delete=extend_schema(
-        description='Delete genre by id',
+        description="Delete genre by id",
     ),
 )
 @extend_schema(
-    tags=['genre'],
+    tags=["genre"],
 )
 class RetrieveUpdateDeleteGenreView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete genre by id"""
@@ -93,7 +93,7 @@ class RetrieveUpdateDeleteGenreView(generics.RetrieveUpdateDestroyAPIView):
 
 
 @extend_schema(
-    tags=['genre'],
+    tags=["genre"],
 )
 class ListGenreView(generics.ListAPIView):
     """List genres"""
@@ -103,7 +103,7 @@ class ListGenreView(generics.ListAPIView):
 
 
 @extend_schema(
-    tags=['hall'],
+    tags=["hall"],
 )
 class CreateHallView(generics.CreateAPIView):
     """Add new hall"""
@@ -115,20 +115,20 @@ class CreateHallView(generics.CreateAPIView):
 
 @extend_schema_view(
     get=extend_schema(
-        description='Retrieve hall by id',
+        description="Retrieve hall by id",
     ),
     put=extend_schema(
-        description='Update hall by id',
+        description="Update hall by id",
     ),
     patch=extend_schema(
-        description='Partially update hall by id',
+        description="Partially update hall by id",
     ),
     delete=extend_schema(
-        description='Delete hall by id',
+        description="Delete hall by id",
     ),
 )
 @extend_schema(
-    tags=['hall'],
+    tags=["hall"],
 )
 class RetrieveUpdateDeleteHallView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete hall by id"""
@@ -139,7 +139,7 @@ class RetrieveUpdateDeleteHallView(generics.RetrieveUpdateDestroyAPIView):
 
 
 @extend_schema(
-    tags=['hall'],
+    tags=["hall"],
 )
 class ListHallView(generics.ListAPIView):
     """List halls"""

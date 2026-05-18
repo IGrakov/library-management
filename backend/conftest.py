@@ -9,22 +9,22 @@ from rest_framework.test import APIClient
 from user import constants
 from user.factories import UserFactory
 
-TEST_FIRST_NAME = 'Test first name'
-TEST_LAST_NAME = 'Test last name'
-TEST_EMAIL = 'test@test.com'
-TEST_PASSWORD = 'test_pass123'
+TEST_FIRST_NAME = "Test first name"
+TEST_LAST_NAME = "Test last name"
+TEST_EMAIL = "test@test.com"
+TEST_PASSWORD = "test_pass123"
 
 
-# def pytest_collection_modifyitems(items):
-#     """Randomizes tests in order to prevent mutual dependencies."""
-#
-#     # use current UNIX timestamp as seed
-#     seed = int(time.time())
-#     random.seed(seed)
-#
-#     print(f"\npytest: randomizing tests order with seed = {seed}\n")  # noqa: T201
-#
-#     random.shuffle(items)
+def pytest_collection_modifyitems(items):
+    """Randomizes tests in order to prevent mutual dependencies."""
+
+    # use current UNIX timestamp as seed
+    seed = int(time.time())
+    random.seed(seed)
+
+    print(f"\npytest: randomizing tests order with seed = {seed}\n")
+
+    random.shuffle(items)
 
 
 @pytest.fixture(autouse=True)
@@ -44,7 +44,7 @@ def fast_password_hashers(settings):
 
 
 @pytest.fixture(autouse=True)
-def create_roles(db):
+def create_roles(db):  # noqa: ARG001
     for role in constants.Roles:
         Group.objects.get_or_create(name=role)
 
@@ -56,38 +56,22 @@ def api_client():
 
 @pytest.fixture
 def super_user():
-    return UserFactory(
-        first_name='superuser',
-        last_name='superuser',
-        is_superuser=True
-    )
+    return UserFactory(first_name="superuser", last_name="superuser", is_superuser=True)
 
 
 @pytest.fixture
 def admin_user():
-    return UserFactory(
-        first_name='admin',
-        last_name='admin',
-        role=constants.Roles.ADMIN
-    )
+    return UserFactory(first_name="admin", last_name="admin", role=constants.Roles.ADMIN)
 
 
 @pytest.fixture
 def librarian_user():
-    return UserFactory(
-        first_name='librarian',
-        last_name='librarian',
-        role=constants.Roles.LIBRARIAN
-    )
+    return UserFactory(first_name="librarian", last_name="librarian", role=constants.Roles.LIBRARIAN)
 
 
 @pytest.fixture
 def reader_user():
-    return UserFactory(
-        first_name='reader',
-        last_name='reader',
-        role=constants.Roles.READER
-    )
+    return UserFactory(first_name="reader", last_name="reader", role=constants.Roles.READER)
 
 
 @pytest.fixture
@@ -95,20 +79,22 @@ def auth_client(api_client):
     def _auth(user):
         api_client.force_authenticate(user=user)
         return api_client
+
     return _auth
 
 
 @pytest.fixture
 def user_update_payload():
     return {
-        'first_name': TEST_FIRST_NAME,
-        'last_name': TEST_LAST_NAME,
+        "first_name": TEST_FIRST_NAME,
+        "last_name": TEST_LAST_NAME,
         "password": TEST_PASSWORD,
     }
+
 
 @pytest.fixture
 def user_create_payload(user_update_payload):
     return {
         **user_update_payload,
-        'email': TEST_EMAIL,
+        "email": TEST_EMAIL,
     }

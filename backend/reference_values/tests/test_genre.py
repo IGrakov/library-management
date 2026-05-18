@@ -1,16 +1,16 @@
 from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.urls import reverse
-
-from rest_framework.test import APIClient
 from rest_framework import status
+from rest_framework.test import APIClient
 
-from reference_values.models import Genre
 from reference_values.factories import GenreFactory
-from user import factories, constants
+from reference_values.models import Genre
+from user import constants, factories
 
-ADD_GENRE_URL = reverse('reference_values:add_genre')
-LIST_GENRE_URL = reverse('reference_values:list_genre')
+ADD_GENRE_URL = reverse("reference_values:add_genre")
+LIST_GENRE_URL = reverse("reference_values:list_genre")
+
 
 class PublicGenreApiTest(TestCase):
     """Test genre API (public)"""
@@ -23,7 +23,7 @@ class PublicGenreApiTest(TestCase):
         """Test creating a genre by an unauthenticated user"""
 
         payload = {
-            'name': 'Test genre',
+            "name": "Test genre",
         }
 
         res = self.client.post(ADD_GENRE_URL, payload)
@@ -32,13 +32,13 @@ class PublicGenreApiTest(TestCase):
     def test_retrieve_genre_by_unauthenticated_user_fails(self):
         """Test retrieving a genre by an unauthenticated user"""
         genre = GenreFactory.create()
-        res = self.client.get(reverse('reference_values:manage_genre', kwargs={'pk': genre.id}))
+        res = self.client.get(reverse("reference_values:manage_genre", kwargs={"pk": genre.id}))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_genre_by_unauthenticated_user_fails(self):
         """Test deleting a genre by an unauthenticated user"""
         genre = GenreFactory.create()
-        res = self.client.delete(reverse('reference_values:manage_genre', kwargs={'pk': genre.id}))
+        res = self.client.delete(reverse("reference_values:manage_genre", kwargs={"pk": genre.id}))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_genre_by_unauthenticated_user_fails(self):
@@ -46,10 +46,10 @@ class PublicGenreApiTest(TestCase):
         genre = GenreFactory.create()
 
         payload = {
-            'name': 'Test genre',
+            "name": "Test genre",
         }
 
-        res = self.client.put(reverse('reference_values:manage_genre', kwargs={'pk': genre.id}), payload)
+        res = self.client.put(reverse("reference_values:manage_genre", kwargs={"pk": genre.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_list_genres_by_unauthenticated_user_fails(self):
@@ -75,7 +75,7 @@ class PrivateGenreApiUserNotAdminTest(TestCase):
         """Test creating a genre by an authenticated user not in admin group"""
 
         payload = {
-            'name': 'Test genre',
+            "name": "Test genre",
         }
 
         res = self.client.post(ADD_GENRE_URL, payload)
@@ -84,13 +84,13 @@ class PrivateGenreApiUserNotAdminTest(TestCase):
     def test_retrieve_genre_by_user_not_admin_success(self):
         """Test retrieving a genre by an authenticated user not in admin group"""
         genre = GenreFactory.create()
-        res = self.client.get(reverse('reference_values:manage_genre', kwargs={'pk': genre.id}))
+        res = self.client.get(reverse("reference_values:manage_genre", kwargs={"pk": genre.id}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_delete_genre_by_user_not_admin_fails(self):
         """Test deleting a genre by an authenticated user not in admin group"""
         genre = GenreFactory.create()
-        res = self.client.delete(reverse('reference_values:manage_genre', kwargs={'pk': genre.id}))
+        res = self.client.delete(reverse("reference_values:manage_genre", kwargs={"pk": genre.id}))
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_update_genre_by_user_not_admin_fails(self):
@@ -98,10 +98,10 @@ class PrivateGenreApiUserNotAdminTest(TestCase):
         genre = GenreFactory.create()
 
         payload = {
-            'name': 'Test genre',
+            "name": "Test genre",
         }
 
-        res = self.client.put(reverse('reference_values:manage_genre', kwargs={'pk': genre.id}), payload)
+        res = self.client.put(reverse("reference_values:manage_genre", kwargs={"pk": genre.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_list_genres_by_user_not_admin_fails(self):
@@ -125,7 +125,7 @@ class PrivateGenreApiUserAdminTest(TestCase):
         """Test creating a genre by an authenticated user in admin group"""
 
         payload = {
-            'name': 'Test genre',
+            "name": "Test genre",
         }
 
         res = self.client.post(ADD_GENRE_URL, payload)
@@ -134,13 +134,13 @@ class PrivateGenreApiUserAdminTest(TestCase):
     def test_retrieve_genre_by_user_admin_success(self):
         """Test retrieving a genre by an authenticated user in admin group"""
         genre = GenreFactory.create()
-        res = self.client.get(reverse('reference_values:manage_genre', kwargs={'pk': genre.id}))
+        res = self.client.get(reverse("reference_values:manage_genre", kwargs={"pk": genre.id}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_delete_genre_by_user_admin_success(self):
         """Test deleting a genre by an authenticated user in admin group"""
         genre = GenreFactory.create()
-        res = self.client.delete(reverse('reference_values:manage_genre', kwargs={'pk': genre.id}))
+        res = self.client.delete(reverse("reference_values:manage_genre", kwargs={"pk": genre.id}))
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Genre.objects.filter(id=genre.id).first(), None)
 
@@ -149,10 +149,10 @@ class PrivateGenreApiUserAdminTest(TestCase):
         genre = GenreFactory.create()
 
         payload = {
-            'name': 'Test genre',
+            "name": "Test genre",
         }
 
-        res = self.client.put(reverse('reference_values:manage_genre', kwargs={'pk': genre.id}), payload)
+        res = self.client.put(reverse("reference_values:manage_genre", kwargs={"pk": genre.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_list_genres_by_user_admin_success(self):

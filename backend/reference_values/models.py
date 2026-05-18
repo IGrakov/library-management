@@ -11,11 +11,11 @@ class Language(TimeStampMixin):
     two_letter_code = models.CharField(max_length=2)
     three_letter_code = models.CharField(max_length=3)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     class Meta:
-        verbose_name = 'Language'
+        verbose_name = "Language"
 
 
 class Genre(TimeStampMixin):
@@ -23,11 +23,11 @@ class Genre(TimeStampMixin):
 
     name = models.CharField(max_length=255)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     class Meta:
-        verbose_name = 'Genre'
+        verbose_name = "Genre"
 
 
 class Hall(TimeStampMixin):
@@ -35,8 +35,8 @@ class Hall(TimeStampMixin):
 
     name = models.CharField(max_length=255)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     class Meta:
-        verbose_name = 'Hall'
+        verbose_name = "Hall"

@@ -1,17 +1,17 @@
 from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.urls import reverse
-
-from rest_framework.test import APIClient
 from rest_framework import status
+from rest_framework.test import APIClient
 
 from reference_values.constants import HallTypes
-from reference_values.models import Hall
 from reference_values.factories import HallFactory
-from user import factories, constants
+from reference_values.models import Hall
+from user import constants, factories
 
-ADD_HALL_URL = reverse('reference_values:add_hall')
-LIST_HALL_URL = reverse('reference_values:list_hall')
+ADD_HALL_URL = reverse("reference_values:add_hall")
+LIST_HALL_URL = reverse("reference_values:list_hall")
+
 
 class PublicHallApiTest(TestCase):
     """Test hall API (public)"""
@@ -24,7 +24,7 @@ class PublicHallApiTest(TestCase):
         """Test creating a hall by an unauthenticated user"""
 
         payload = {
-            'name': HallTypes.READING_HALL,
+            "name": HallTypes.READING_HALL,
         }
 
         res = self.client.post(ADD_HALL_URL, payload)
@@ -33,13 +33,13 @@ class PublicHallApiTest(TestCase):
     def test_retrieve_hall_by_unauthenticated_user_fails(self):
         """Test retrieving a hall by an unauthenticated user"""
         hall = HallFactory.create()
-        res = self.client.get(reverse('reference_values:manage_hall', kwargs={'pk': hall.id}))
+        res = self.client.get(reverse("reference_values:manage_hall", kwargs={"pk": hall.id}))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_hall_by_unauthenticated_user_fails(self):
         """Test deleting a hall by an unauthenticated user"""
         hall = HallFactory.create()
-        res = self.client.delete(reverse('reference_values:manage_hall', kwargs={'pk': hall.id}))
+        res = self.client.delete(reverse("reference_values:manage_hall", kwargs={"pk": hall.id}))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_hall_by_unauthenticated_user_fails(self):
@@ -47,10 +47,10 @@ class PublicHallApiTest(TestCase):
         hall = HallFactory.create()
 
         payload = {
-            'name': 'Test hall',
+            "name": "Test hall",
         }
 
-        res = self.client.put(reverse('reference_values:manage_hall', kwargs={'pk': hall.id}), payload)
+        res = self.client.put(reverse("reference_values:manage_hall", kwargs={"pk": hall.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_list_hall_by_unauthenticated_user_fails(self):
@@ -76,7 +76,7 @@ class PrivateHallApiUserNotAdminTest(TestCase):
         """Test creating a hall by an authenticated user not in admin group"""
 
         payload = {
-            'name': HallTypes.READING_HALL,
+            "name": HallTypes.READING_HALL,
         }
 
         res = self.client.post(ADD_HALL_URL, payload)
@@ -85,13 +85,13 @@ class PrivateHallApiUserNotAdminTest(TestCase):
     def test_retrieve_hall_by_user_not_admin_success(self):
         """Test retrieving a hall by an authenticated user not in admin group"""
         hall = HallFactory.create()
-        res = self.client.get(reverse('reference_values:manage_hall', kwargs={'pk': hall.id}))
+        res = self.client.get(reverse("reference_values:manage_hall", kwargs={"pk": hall.id}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_delete_hall_by_user_not_admin_fails(self):
         """Test deleting a hall by an authenticated user not in admin group"""
         hall = HallFactory.create()
-        res = self.client.delete(reverse('reference_values:manage_hall', kwargs={'pk': hall.id}))
+        res = self.client.delete(reverse("reference_values:manage_hall", kwargs={"pk": hall.id}))
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_update_hall_by_user_not_admin_fails(self):
@@ -99,10 +99,10 @@ class PrivateHallApiUserNotAdminTest(TestCase):
         hall = HallFactory.create()
 
         payload = {
-            'name': HallTypes.READING_HALL,
+            "name": HallTypes.READING_HALL,
         }
 
-        res = self.client.put(reverse('reference_values:manage_hall', kwargs={'pk': hall.id}), payload)
+        res = self.client.put(reverse("reference_values:manage_hall", kwargs={"pk": hall.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_list_halls_by_user_not_admin_fails(self):
@@ -126,7 +126,7 @@ class PrivateHallApiUserAdminTest(TestCase):
         """Test creating a hall by an authenticated user in admin group"""
 
         payload = {
-            'name': 'Test hall',
+            "name": "Test hall",
         }
 
         res = self.client.post(ADD_HALL_URL, payload)
@@ -135,13 +135,13 @@ class PrivateHallApiUserAdminTest(TestCase):
     def test_retrieve_hall_by_user_admin_success(self):
         """Test retrieving a hall by an authenticated user in admin group"""
         hall = HallFactory.create()
-        res = self.client.get(reverse('reference_values:manage_hall', kwargs={'pk': hall.id}))
+        res = self.client.get(reverse("reference_values:manage_hall", kwargs={"pk": hall.id}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_delete_hall_by_user_admin_success(self):
         """Test deleting a hall by an authenticated user in admin group"""
         hall = HallFactory.create()
-        res = self.client.delete(reverse('reference_values:manage_hall', kwargs={'pk': hall.id}))
+        res = self.client.delete(reverse("reference_values:manage_hall", kwargs={"pk": hall.id}))
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Hall.objects.filter(id=hall.id).first(), None)
 
@@ -150,10 +150,10 @@ class PrivateHallApiUserAdminTest(TestCase):
         hall = HallFactory.create()
 
         payload = {
-            'name': 'Test hall',
+            "name": "Test hall",
         }
 
-        res = self.client.put(reverse('reference_values:manage_hall', kwargs={'pk': hall.id}), payload)
+        res = self.client.put(reverse("reference_values:manage_hall", kwargs={"pk": hall.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_list_halls_by_user_admin_success(self):

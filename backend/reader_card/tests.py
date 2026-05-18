@@ -13,13 +13,13 @@ from user import constants
 from user.factories import UserFactory
 from user.serializers import UserSerializer
 
-CREATE_READER_CARD_URL = reverse('reader_card:create_reader_card')
-LIST_READER_CARD_URL = reverse('reader_card:list_reader_card')
+CREATE_READER_CARD_URL = reverse("reader_card:create_reader_card")
+LIST_READER_CARD_URL = reverse("reader_card:list_reader_card")
 
 small_gif = (
-    b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x00\x00\x00\x21\xf9\x04'
-    b'\x01\x0a\x00\x01\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02'
-    b'\x02\x4c\x01\x00\x3b'
+    b"\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x00\x00\x00\x21\xf9\x04"
+    b"\x01\x0a\x00\x01\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02"
+    b"\x02\x4c\x01\x00\x3b"
 )
 
 
@@ -30,14 +30,14 @@ class PublicReaderCardApiTests(TestCase):
         self.user = UserFactory()
         self.client = APIClient()
 
-        self.photo = SimpleUploadedFile('reader_photo.jpg', small_gif, content_type='image/jpg')
+        self.photo = SimpleUploadedFile("reader_photo.jpg", small_gif, content_type="image/jpg")
 
     def test_create_reader_card_unauthenticated_fails(self):
         """Test creating a reader card by an unauthenticated user"""
         reader = UserFactory()
         hall = HallFactory()
 
-        payload = {'reader': reader.id, 'photo': self.photo, 'hall_access': [hall.id]}
+        payload = {"reader": reader.id, "photo": self.photo, "hall_access": [hall.id]}
 
         res = self.client.post(CREATE_READER_CARD_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -46,14 +46,14 @@ class PublicReaderCardApiTests(TestCase):
         """Test retrieving a reader card by an unauthenticated user"""
         reader_card = ReaderCardFactory()
 
-        res = self.client.get(reverse('reader_card:manage_reader_card', kwargs={'pk': reader_card.id}))
+        res = self.client.get(reverse("reader_card:manage_reader_card", kwargs={"pk": reader_card.id}))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_reader_card_unauthenticated_fails(self):
         """Test deleting a reader card by an unauthenticated user"""
         reader_card = ReaderCardFactory()
 
-        res = self.client.delete(reverse('reader_card:manage_reader_card', kwargs={'pk': reader_card.id}))
+        res = self.client.delete(reverse("reader_card:manage_reader_card", kwargs={"pk": reader_card.id}))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_reader_card_unauthenticated_fails(self):
@@ -62,9 +62,9 @@ class PublicReaderCardApiTests(TestCase):
 
         hall_ids = [hall.id for hall in second_reader_card.hall_access.all()]
 
-        payload = {'reader': first_reader_card.reader, 'photo': second_reader_card.photo, 'hall_access': hall_ids}
+        payload = {"reader": first_reader_card.reader, "photo": second_reader_card.photo, "hall_access": hall_ids}
 
-        res = self.client.put(reverse('reader_card:manage_reader_card', kwargs={'pk': first_reader_card.id}), payload)
+        res = self.client.put(reverse("reader_card:manage_reader_card", kwargs={"pk": first_reader_card.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_list_reader_cards_unauthenticated_fails(self):
@@ -85,7 +85,7 @@ class PrivateReaderCardApiUserLibrarianTests(TestCase):
         admin_group.user_set.add(self.user.id)
         self.client.force_authenticate(user=self.user)
 
-        self.photo = SimpleUploadedFile('reader_photo.jpg', small_gif, content_type='image/jpg')
+        self.photo = SimpleUploadedFile("reader_photo.jpg", small_gif, content_type="image/jpg")
 
         self.maxDiff = None
 
@@ -95,7 +95,7 @@ class PrivateReaderCardApiUserLibrarianTests(TestCase):
         reader = UserFactory()
         hall = HallFactory()
 
-        payload = {'reader': reader.id, 'photo': self.photo, 'hall_access': [hall.id]}
+        payload = {"reader": reader.id, "photo": self.photo, "hall_access": [hall.id]}
 
         res = self.client.post(CREATE_READER_CARD_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
@@ -108,15 +108,15 @@ class PrivateReaderCardApiUserLibrarianTests(TestCase):
         """Test retrieving a reader card by an authenticated user in librarian group"""
         reader_card = ReaderCardFactory()
 
-        res = self.client.get(reverse('reader_card:manage_reader_card', kwargs={'pk': reader_card.id}))
+        res = self.client.get(reverse("reader_card:manage_reader_card", kwargs={"pk": reader_card.id}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         expected_data = {
-            'id': reader_card.id,
-            'reader': UserSerializer(reader_card.reader).data,
-            'photo': f'http://testserver/{reader_card.photo.name}',
-            'is_suspended': reader_card.is_suspended,
-            'hall_access': HallSerializer(reader_card.hall_access, many=True).data,
+            "id": reader_card.id,
+            "reader": UserSerializer(reader_card.reader).data,
+            "photo": f"http://testserver/{reader_card.photo.name}",
+            "is_suspended": reader_card.is_suspended,
+            "hall_access": HallSerializer(reader_card.hall_access, many=True).data,
         }
         self.assertEqual(res.json(), expected_data)
 
@@ -124,7 +124,7 @@ class PrivateReaderCardApiUserLibrarianTests(TestCase):
         """Test deleting a reader card by an authenticated user in librarian group"""
         reader_card = ReaderCardFactory()
 
-        res = self.client.delete(reverse('reader_card:manage_reader_card', kwargs={'pk': reader_card.id}))
+        res = self.client.delete(reverse("reader_card:manage_reader_card", kwargs={"pk": reader_card.id}))
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(ReaderCard.objects.filter(id=reader_card.id).first(), None)
 
@@ -132,9 +132,9 @@ class PrivateReaderCardApiUserLibrarianTests(TestCase):
         """Test partially updating a reader card by an authenticated user in librarian group"""
         first_reader_card, second_reader_card = ReaderCardFactory.create_batch(2)
         hall_ids = [hall.id for hall in second_reader_card.hall_access.all()]
-        payload = {'hall_access': hall_ids}
+        payload = {"hall_access": hall_ids}
 
-        res = self.client.patch(reverse('reader_card:manage_reader_card', kwargs={'pk': first_reader_card.id}), payload)
+        res = self.client.patch(reverse("reader_card:manage_reader_card", kwargs={"pk": first_reader_card.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         updated_reader_card = ReaderCard.objects.filter(id=first_reader_card.id).first()
@@ -146,9 +146,9 @@ class PrivateReaderCardApiUserLibrarianTests(TestCase):
         """Test updating a reader card by an authenticated user in librarian group"""
         first_reader_card, second_reader_card = ReaderCardFactory.create_batch(2)
         hall_ids = [hall.id for hall in second_reader_card.hall_access.all()]
-        payload = {'photo': second_reader_card.photo, 'is_suspended': True, 'hall_access': hall_ids}
+        payload = {"photo": second_reader_card.photo, "is_suspended": True, "hall_access": hall_ids}
 
-        res = self.client.put(reverse('reader_card:manage_reader_card', kwargs={'pk': first_reader_card.id}), payload)
+        res = self.client.put(reverse("reader_card:manage_reader_card", kwargs={"pk": first_reader_card.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         updated_reader_card = ReaderCard.objects.filter(id=first_reader_card.id).first()
@@ -178,7 +178,7 @@ class PrivateReaderCardApiUserAdminOrReaderTests(TestCase):
         reader_group.user_set.add(self.user.id)
         self.client.force_authenticate(user=self.user)
 
-        self.photo = SimpleUploadedFile('reader_photo.jpg', small_gif, content_type='image/jpg')
+        self.photo = SimpleUploadedFile("reader_photo.jpg", small_gif, content_type="image/jpg")
 
         self.maxDiff = None
 
@@ -188,7 +188,7 @@ class PrivateReaderCardApiUserAdminOrReaderTests(TestCase):
         reader = UserFactory()
         hall = HallFactory()
 
-        payload = {'reader': reader.id, 'photo': self.photo, 'hall_access': [hall.id]}
+        payload = {"reader": reader.id, "photo": self.photo, "hall_access": [hall.id]}
 
         res = self.client.post(CREATE_READER_CARD_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
@@ -197,23 +197,23 @@ class PrivateReaderCardApiUserAdminOrReaderTests(TestCase):
         """Test retrieving a reader card by an authenticated user in admin or reader group"""
         reader_card = ReaderCardFactory()
 
-        res = self.client.get(reverse('reader_card:manage_reader_card', kwargs={'pk': reader_card.id}))
+        res = self.client.get(reverse("reader_card:manage_reader_card", kwargs={"pk": reader_card.id}))
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_reader_card_fail(self):
         """Test deleting a reader card by an authenticated user in admin or reader group"""
         reader_card = ReaderCardFactory()
 
-        res = self.client.delete(reverse('reader_card:manage_reader_card', kwargs={'pk': reader_card.id}))
+        res = self.client.delete(reverse("reader_card:manage_reader_card", kwargs={"pk": reader_card.id}))
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_update_reader_card_fail(self):
         """Test updating a reader card by an authenticated user in admin or reader group"""
         first_reader_card, second_reader_card = ReaderCardFactory.create_batch(2)
         hall_ids = [hall.id for hall in second_reader_card.hall_access.all()]
-        payload = {'photo': second_reader_card.photo, 'is_suspended': True, 'hall_access': hall_ids}
+        payload = {"photo": second_reader_card.photo, "is_suspended": True, "hall_access": hall_ids}
 
-        res = self.client.put(reverse('reader_card:manage_reader_card', kwargs={'pk': first_reader_card.id}), payload)
+        res = self.client.put(reverse("reader_card:manage_reader_card", kwargs={"pk": first_reader_card.id}), payload)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_list_reader_cards_fail(self):

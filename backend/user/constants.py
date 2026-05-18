@@ -2,9 +2,10 @@ from django.db import models
 
 
 class Roles(models.TextChoices):
-    ADMIN = 'Admin', 'Admin'
-    READER = 'Reader', 'Reader'
-    LIBRARIAN = 'Librarian', 'Librarian'
+    ADMIN = "Admin", "Admin"
+    READER = "Reader", "Reader"
+    LIBRARIAN = "Librarian", "Librarian"
+
 
 INACTIVE_USER_RANK = -1
 SUPER_USER_RANK = 100

@@ -1,61 +1,63 @@
 from random import randint
+from typing import Any, Iterable
 
 import factory
 
 from book.models import Author, Book, BookCopy
 from reference_values.factories import GenreFactory, LanguageFactory
+from reference_values.models import Genre, Language
 
 
 class AuthorFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Author
 
-    last_name = factory.Faker('last_name')
-    first_name = factory.Faker('first_name')
-    middle_name = factory.Faker('first_name')
+    last_name = factory.Faker("last_name")
+    first_name = factory.Faker("first_name")
+    middle_name = factory.Faker("first_name")
 
 
 class BookFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Book
 
-    title = factory.Faker('sentence', nb_words=5, variable_nb_words=True)
-    published_date = factory.Faker('date')
-    isbn = factory.Faker('isbn13')
-    pages = factory.Faker('pyint', min_value=10, max_value=1_000)
-    cover = factory.Faker('image_url')
+    title = factory.Faker("sentence", nb_words=5, variable_nb_words=True)
+    published_date = factory.Faker("date")
+    isbn = factory.Faker("isbn13")
+    pages = factory.Faker("pyint", min_value=10, max_value=1_000)
+    cover = factory.Faker("image_url")
 
     @factory.post_generation
-    def author(self, create, extracted, **kwargs):
+    def author(self, create: bool, extracted: Iterable[Author], **kwargs: Any) -> None:  # noqa: ARG002, ANN401
         if not create:
             return
 
         if extracted:
             self.author.add(*extracted)
         else:
-            num_of_authors = randint(1, 3)
+            num_of_authors = randint(1, 3)  # noqa: S311
             self.author.add(*AuthorFactory.create_batch(num_of_authors))
 
     @factory.post_generation
-    def language(self, create, extracted, **kwargs):
+    def language(self, create: bool, extracted: Iterable[Language], **kwargs: Any) -> None:  # noqa: ARG002, ANN401
         if not create:
             return
 
         if extracted:
             self.language.add(*extracted)
         else:
-            num_of_languages = randint(1, 3)
+            num_of_languages = randint(1, 3)  # noqa: S311
             self.language.add(*LanguageFactory.create_batch(num_of_languages))
 
     @factory.post_generation
-    def genre(self, create, extracted, **kwargs):
+    def genre(self, create: bool, extracted: Iterable[Genre], **kwargs: Any) -> None:  # noqa: ARG002, ANN401
         if not create:
             return
 
         if extracted:
             self.genre.add(*extracted)
         else:
-            num_of_genres = randint(1, 3)
+            num_of_genres = randint(1, 3)  # noqa: S311
             self.genre.add(*GenreFactory.create_batch(num_of_genres))
 
 

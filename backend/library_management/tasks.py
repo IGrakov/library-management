@@ -1,6 +1,7 @@
 from celery import shared_task
-from datetime import datetime
+from django.utils import timezone
+
 
 @shared_task()
-def test_task():
-    print(f"Test task @{datetime.now()}")
+def test_task() -> None:
+    print(f"Test task @{timezone.now()}")

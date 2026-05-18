@@ -13,7 +13,7 @@ from user.permissions import IsLibrarian
         responses={
             status.HTTP_201_CREATED: ReaderCardSerializer,
         },
-    )
+    ),
 )
 class CreateReaderCardView(generics.CreateAPIView):
     """Create new reader card"""
@@ -30,25 +30,25 @@ class CreateReaderCardView(generics.CreateAPIView):
 
 @extend_schema_view(
     get=extend_schema(
-        description='Retrieve reader card by id',
+        description="Retrieve reader card by id",
     ),
     put=extend_schema(
-        description='Update reader card by id',
+        description="Update reader card by id",
         request={
-            'application/json': {
-                'type': 'object',
-                'properties': {
-                    'is_suspended': {'type': 'boolean'},
-                    'photo': {'type': 'string', 'format': 'file'},
-                    'hall_access': {'type': 'array', 'items': {'type': 'integer'}},
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "is_suspended": {"type": "boolean"},
+                    "photo": {"type": "string", "format": "file"},
+                    "hall_access": {"type": "array", "items": {"type": "integer"}},
                 },
             },
-            'multipart/from-data': {
-                'type': 'object',
-                'properties': {
-                    'is_suspended': {'type': 'boolean'},
-                    'photo': {'type': 'string', 'format': 'uri'},
-                    'hall_access': {'type': 'array', 'items': {'type': 'integer'}},
+            "multipart/from-data": {
+                "type": "object",
+                "properties": {
+                    "is_suspended": {"type": "boolean"},
+                    "photo": {"type": "string", "format": "uri"},
+                    "hall_access": {"type": "array", "items": {"type": "integer"}},
                 },
             },
         },
@@ -57,22 +57,22 @@ class CreateReaderCardView(generics.CreateAPIView):
         },
     ),
     patch=extend_schema(
-        description='Partially update reader card by id',
+        description="Partially update reader card by id",
         request={
-            'application/json': {
-                'type': 'object',
-                'properties': {
-                    'is_suspended': {'type': 'boolean'},
-                    'photo': {'type': 'string', 'format': 'file'},
-                    'hall_access': {'type': 'array', 'items': {'type': 'integer'}},
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "is_suspended": {"type": "boolean"},
+                    "photo": {"type": "string", "format": "file"},
+                    "hall_access": {"type": "array", "items": {"type": "integer"}},
                 },
             },
-            'multipart/from-data': {
-                'type': 'object',
-                'properties': {
-                    'is_suspended': {'type': 'boolean'},
-                    'photo': {'type': 'string', 'format': 'uri'},
-                    'hall_access': {'type': 'array', 'items': {'type': 'integer'}},
+            "multipart/from-data": {
+                "type": "object",
+                "properties": {
+                    "is_suspended": {"type": "boolean"},
+                    "photo": {"type": "string", "format": "uri"},
+                    "hall_access": {"type": "array", "items": {"type": "integer"}},
                 },
             },
         },
@@ -81,7 +81,7 @@ class CreateReaderCardView(generics.CreateAPIView):
         },
     ),
     delete=extend_schema(
-        description='Delete reader card by id',
+        description="Delete reader card by id",
     ),
 )
 class RetrieveUpdateDeleteReaderCardView(generics.RetrieveUpdateDestroyAPIView):
@@ -96,15 +96,14 @@ class RetrieveUpdateDeleteReaderCardView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ReaderCard.objects.all()
 
     def get_serializer_class(self):
-        if self.request.method in ['PUT', 'PATCH']:
+        if self.request.method in ["PUT", "PATCH"]:
             return ReaderCardWriteSerializer
-        else:
-            return ReaderCardSerializer
+        return ReaderCardSerializer
 
 
 class ListReaderCardView(generics.ListAPIView):
     """List reader cards"""
 
     permission_classes = (IsLibrarian,)
-    queryset = ReaderCard.objects.all().select_related('reader').prefetch_related('hall_access')
+    queryset = ReaderCard.objects.all().select_related("reader").prefetch_related("hall_access")
     serializer_class = ReaderCardSerializer

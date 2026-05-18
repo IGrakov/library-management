@@ -1,17 +1,16 @@
 from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.urls import reverse
-
-from rest_framework.test import APIClient
 from rest_framework import status
+from rest_framework.test import APIClient
 
-from book.factories import AuthorFactory, BookFactory, BookCopyFactory
-from book.models import Author, BookCopy
-from reference_values.models import Language
-from user import factories, constants
+from book.factories import BookCopyFactory, BookFactory
+from book.models import BookCopy
+from user import constants, factories
 
-CREATE_BOOK_COPY_URL = reverse('book:create_book_copy')
-LIST_BOOK_COPY_URL = reverse('book:list_book_copy')
+CREATE_BOOK_COPY_URL = reverse("book:create_book_copy")
+LIST_BOOK_COPY_URL = reverse("book:list_book_copy")
+
 
 class PublicBookCopyApiTest(TestCase):
     """Test book copy API (public)"""
@@ -26,7 +25,7 @@ class PublicBookCopyApiTest(TestCase):
         book = BookFactory()
 
         payload = {
-            'book_id': book.id,
+            "book_id": book.id,
         }
 
         res = self.client.post(CREATE_BOOK_COPY_URL, payload)
@@ -35,13 +34,13 @@ class PublicBookCopyApiTest(TestCase):
     def test_retrieve_book_copy_by_unauthenticated_user_fails(self):
         """Test retrieving a book copy by an unauthenticated user"""
         book_copy = BookCopyFactory.create()
-        res = self.client.get(reverse('book:manage_book_copy', kwargs={'pk': book_copy.id}))
+        res = self.client.get(reverse("book:manage_book_copy", kwargs={"pk": book_copy.id}))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_book_copy_by_unauthenticated_user_fails(self):
         """Test deleting a book copy by an unauthenticated user"""
         book_copy = BookCopyFactory.create()
-        res = self.client.delete(reverse('book:manage_book_copy', kwargs={'pk': book_copy.id}))
+        res = self.client.delete(reverse("book:manage_book_copy", kwargs={"pk": book_copy.id}))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_list_book_copies_by_unauthenticated_user_fails(self):
@@ -69,7 +68,7 @@ class PrivateBookCopyApiUserNotAdminTest(TestCase):
         book = BookFactory()
 
         payload = {
-            'book_id': book.id,
+            "book_id": book.id,
         }
 
         res = self.client.post(CREATE_BOOK_COPY_URL, payload)
@@ -78,13 +77,13 @@ class PrivateBookCopyApiUserNotAdminTest(TestCase):
     def test_retrieve_book_copy_by_user_not_admin_success(self):
         """Test retrieving a book copy by an authenticated user not in admin group"""
         book_copy = BookCopyFactory.create()
-        res = self.client.get(reverse('book:manage_book_copy', kwargs={'pk': book_copy.id}))
+        res = self.client.get(reverse("book:manage_book_copy", kwargs={"pk": book_copy.id}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_delete_book_copy_by_user_not_admin_fails(self):
         """Test deleting a book copy by an authenticated user not in admin group"""
         book_copy = BookCopyFactory.create()
-        res = self.client.delete(reverse('book:manage_book_copy', kwargs={'pk': book_copy.id}))
+        res = self.client.delete(reverse("book:manage_book_copy", kwargs={"pk": book_copy.id}))
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_list_author_by_user_not_admin_fails(self):
@@ -110,7 +109,7 @@ class PrivateAuthorApiUserAdminTest(TestCase):
         book = BookFactory()
 
         payload = {
-            'book_id': book.id,
+            "book_id": book.id,
         }
 
         res = self.client.post(CREATE_BOOK_COPY_URL, payload)
@@ -119,13 +118,13 @@ class PrivateAuthorApiUserAdminTest(TestCase):
     def test_retrieve_book_copy_by_user_admin_success(self):
         """Test retrieving a book copy by an authenticated user in admin group"""
         book_copy = BookCopyFactory.create()
-        res = self.client.get(reverse('book:manage_book_copy', kwargs={'pk': book_copy.id}))
+        res = self.client.get(reverse("book:manage_book_copy", kwargs={"pk": book_copy.id}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_delete_book_copy_by_user_admin_success(self):
         """Test deleting a book copy by an authenticated user in admin group"""
         book_copy = BookCopyFactory.create()
-        res = self.client.delete(reverse('book:manage_book_copy', kwargs={'pk': book_copy.id}))
+        res = self.client.delete(reverse("book:manage_book_copy", kwargs={"pk": book_copy.id}))
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(BookCopy.objects.filter(id=book_copy.id).first(), None)
 

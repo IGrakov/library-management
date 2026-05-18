@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.db.transaction import atomic
 from rest_framework import serializers
 
@@ -7,39 +9,38 @@ from reference_values.serializers import GenreSerializer, LanguageSerializer
 
 
 class AuthorSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Author
 
-        fields = [
-            'id',
-            'last_name',
-            'first_name',
-            'middle_name',
-        ]
+        fields = (
+            "id",
+            "last_name",
+            "first_name",
+            "middle_name",
+        )
 
 
 class BookSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(many=True, read_only=True)
     language = LanguageSerializer(many=True, read_only=True)
     genre = GenreSerializer(many=True, read_only=True)
-    copies_count = serializers.IntegerField(source='copies.count', read_only=True)
+    copies_count = serializers.IntegerField(source="copies.count", read_only=True)
 
     class Meta:
         model = Book
 
-        fields = [
-            'id',
-            'title',
-            'author',
-            'published_date',
-            'isbn',
-            'pages',
-            'cover',
-            'language',
-            'genre',
-            'copies_count',
-        ]
+        fields = (
+            "id",
+            "title",
+            "author",
+            "published_date",
+            "isbn",
+            "pages",
+            "cover",
+            "language",
+            "genre",
+            "copies_count",
+        )
 
 
 class BookWriteSerializer(serializers.ModelSerializer):
@@ -47,16 +48,21 @@ class BookWriteSerializer(serializers.ModelSerializer):
     language = serializers.ListField(child=serializers.IntegerField(), write_only=True, required=False)
     genre = serializers.ListField(child=serializers.IntegerField(), write_only=True, required=False)
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         book_attrs = {**attrs}
-        book_attrs.pop('author', [])
-        book_attrs.pop('language', [])
-        book_attrs.pop('genre', [])
+        book_attrs.pop("author", [])
+        book_attrs.pop("language", [])
+        book_attrs.pop("genre", [])
 
         return attrs
 
     @staticmethod
-    def add_authors_languages_genres(instance, author_ids, language_ids, genre_ids):  # noqa C901
+    def add_authors_languages_genres(
+        instance: Book,
+        author_ids: list[int],
+        language_ids: list[int],
+        genre_ids: list[int],
+    ) -> None:
 
         for author_id in author_ids:
             author = Author.objects.filter(id=author_id).first()
@@ -75,10 +81,10 @@ class BookWriteSerializer(serializers.ModelSerializer):
                 instance.genre.add(genre)
 
     @atomic
-    def create(self, validated_data):
-        author_ids = validated_data.pop('author', [])
-        language_ids = validated_data.pop('language', [])
-        genre_ids = validated_data.pop('genre', [])
+    def create(self, validated_data: dict[str, Any]) -> Book:
+        author_ids = validated_data.pop("author", [])
+        language_ids = validated_data.pop("language", [])
+        genre_ids = validated_data.pop("genre", [])
 
         book = Book.objects.create(**validated_data)
 
@@ -87,44 +93,44 @@ class BookWriteSerializer(serializers.ModelSerializer):
         return book
 
     @atomic
-    def update(self, instance, validated_data):
-        author_ids = validated_data.pop('author', [])
-        language_ids = validated_data.pop('language', [])
-        genre_ids = validated_data.pop('genre', [])
+    def update(self, instance: Book, validated_data: dict[str, Any]) -> Book:
+        author_ids = validated_data.pop("author", [])
+        language_ids = validated_data.pop("language", [])
+        genre_ids = validated_data.pop("genre", [])
 
         instance = super().update(instance, validated_data)
 
         # Do not remove author references in case that payload for partial update does not contain any authors
-        if author_ids:
+        if author_ids is not None:
             instance.author.remove(*instance.author.all())
         # Do not remove language references in case that payload for partial update does not contain any languages
-        if language_ids:
+        if language_ids is not None:
             instance.language.remove(*instance.language.all())
         # Do not remove genre references in case that payload for partial update does not contain any genres
-        if genre_ids:
+        if genre_ids is not None:
             instance.genre.remove(*instance.genre.all())
 
         self.add_authors_languages_genres(instance, author_ids, language_ids, genre_ids)
 
         return instance
 
-    def to_representation(self, data):
-        return BookSerializer(context=self.context).to_representation(data)
+    def to_representation(self, instance: Book) -> dict[str, Any]:
+        return BookSerializer(context=self.context).to_representation(instance)
 
     class Meta:
         model = Book
 
-        fields = [
-            'id',
-            'title',
-            'author',
-            'published_date',
-            'isbn',
-            'pages',
-            'cover',
-            'language',
-            'genre',
-        ]
+        fields = (
+            "id",
+            "title",
+            "author",
+            "published_date",
+            "isbn",
+            "pages",
+            "cover",
+            "language",
+            "genre",
+        )
 
 
 class BookCopySerializer(serializers.ModelSerializer):
@@ -132,16 +138,16 @@ class BookCopySerializer(serializers.ModelSerializer):
 
     book_id = serializers.PrimaryKeyRelatedField(
         queryset=Book.objects.all(),
-        source='book',
+        source="book",
         write_only=True,
     )
 
     class Meta:
         model = BookCopy
 
-        fields = [
-            'id',
-            'book',
-            'book_id',
-            'uid',
-        ]
+        fields = (
+            "id",
+            "book",
+            "book_id",
+            "uid",
+        )

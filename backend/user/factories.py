@@ -1,10 +1,10 @@
+from typing import Any
+
 import factory
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
 from user import constants
-
-User = get_user_model()
+from user.models import User
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -12,12 +12,12 @@ class UserFactory(factory.django.DjangoModelFactory):
         model = User
         skip_postgeneration_save = True
 
-    email = factory.LazyAttribute(lambda o: '%s@test.com' % f'{o.first_name}.{o.last_name}')
-    first_name = factory.Sequence(lambda n: 'first_name%s' % n)
-    last_name = factory.Sequence(lambda n: 'last_name%s' % n)
+    email = factory.LazyAttribute(lambda o: "%s@test.com" % f"{o.first_name}.{o.last_name}")
+    first_name = factory.Sequence(lambda n: "first_name%s" % n)
+    last_name = factory.Sequence(lambda n: "last_name%s" % n)
 
     @classmethod
-    def _create(cls, model_class, *args, **kwargs):
+    def _create(cls, model_class: type[User], *args: Any, **kwargs: Any) -> User:  # noqa: ANN401
         role = kwargs.pop("role", constants.Roles.READER)
         user = model_class(*args, **kwargs)
         user.set_password(kwargs.get("password", "password123"))

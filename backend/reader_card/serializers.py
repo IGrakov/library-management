@@ -1,5 +1,7 @@
 import pathlib
+from typing import Any
 
+from django.core.files.uploadedfile import UploadedFile
 from django.db.transaction import atomic
 from rest_framework import serializers
 
@@ -18,35 +20,35 @@ class ReaderCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReaderCard
 
-        fields = [
-            'id',
-            'reader',
-            'is_suspended',
-            'photo',
-            'hall_access',
-        ]
+        fields = (
+            "id",
+            "reader",
+            "is_suspended",
+            "photo",
+            "hall_access",
+        )
 
 
 class ReaderCardWriteSerializer(serializers.ModelSerializer):
     reader = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
     hall_access = serializers.ListField(child=serializers.IntegerField(), write_only=True, required=False)
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         reader_card_attrs = {**attrs}
-        reader_card_attrs.pop('reader', None)
-        reader_card_attrs.pop('hall_access', [])
+        reader_card_attrs.pop("reader", None)
+        reader_card_attrs.pop("hall_access", [])
         return attrs
 
     @staticmethod
-    def validate_photo(value):
+    def validate_photo(value: UploadedFile) -> UploadedFile:
         file_extension = pathlib.Path(value.name).suffix.lower()
         if file_extension.lower() not in ACCEPTED_PHOTO_FILE_EXTENSIONS:
-            raise serializers.ValidationError(f'File extension {file_extension} is not allowed')
+            raise serializers.ValidationError(f"File extension {file_extension} is not allowed")  # noqa: EM102, TRY003
         return value
 
     @atomic
-    def create(self, validated_data):
-        hall_ids = validated_data.pop('hall_access', [])
+    def create(self, validated_data: dict[str, Any]) -> ReaderCard:
+        hall_ids = validated_data.pop("hall_access", [])
         reader_card = ReaderCard.objects.create(**validated_data)
 
         for hall_id in hall_ids:
@@ -57,14 +59,14 @@ class ReaderCardWriteSerializer(serializers.ModelSerializer):
         return reader_card
 
     @atomic
-    def update(self, instance, validated_data):
-        validated_data.pop('reader', None)
-        hall_ids = validated_data.pop('hall_access', [])
+    def update(self, instance: ReaderCard, validated_data: dict[str, Any]) -> ReaderCard:
+        validated_data.pop("reader", None)
+        hall_ids = validated_data.pop("hall_access", [])
         instance = super().update(instance, validated_data)
 
         # Do not remove hall references in case that payload for partial update does not contain any halls
-        if hall_ids:
-            instance.hall_access.remove(*instance.hall_access.all())
+        if hall_ids is not None:
+            instance.hall_access.clear()
 
         for hall_id in hall_ids:
             hall = Hall.objects.filter(id=hall_id).first()
@@ -74,16 +76,16 @@ class ReaderCardWriteSerializer(serializers.ModelSerializer):
 
         return instance
 
-    def to_representation(self, data):
-        return ReaderCardSerializer(context=self.context).to_representation(data)
+    def to_representation(self, instance: ReaderCard) -> dict[str, Any]:
+        return ReaderCardSerializer(context=self.context).to_representation(instance)
 
     class Meta:
         model = ReaderCard
 
-        fields = [
-            'id',
-            'reader',
-            'is_suspended',
-            'photo',
-            'hall_access',
-        ]
+        fields = (
+            "id",
+            "reader",
+            "is_suspended",
+            "photo",
+            "hall_access",
+        )
