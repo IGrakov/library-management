@@ -179,24 +179,3 @@ class ListBookCopyView(generics.ListAPIView):
 
     serializer_class = BookCopySerializer
     queryset = BookCopy.objects.select_related("book").prefetch_related("book__author", "book__language", "book__genre")
-
-
-def testView(request):
-    # query = BookCopy.objects.select_related('book').all().prefetch_related('book__author', 'book__language', 'book__genre')
-    # context = {
-    #     "query_list": query,
-    # }
-    # authors = Author.objects.all().order_by('last_name')
-    # authors = Author.objects.prefetch_related('books', 'books__copies')
-    # authors = Author.objects.annotate(num_of_copies=Count('books__copies')).aggregate(num_of_books=Sum(F('num_of_copies')))
-    authors = Author.objects.prefetch_related("books", "books__copies").annotate(
-        num_of_copies=Count("books"),
-        num_of_books=Count("books__copies"),
-    )
-    # stats = authors.prefetch_related('books__copies').values('books__copies').annotate(num_of_copies=Count('books__copies')).order_by('-num_of_copies')
-    context = {
-        "authors": authors,
-        # 'stats': stats,
-    }
-
-    return render(request, "test.html", context)

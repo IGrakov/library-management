@@ -14,7 +14,7 @@ from user.permissions import get_user_role_rank
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the users object"""
 
-    role = serializers.SerializerMethodField(
+    role = serializers.ChoiceField(
         choices=[constants.Roles.READER, constants.Roles.LIBRARIAN, constants.Roles.ADMIN],
         write_only=True,
     )

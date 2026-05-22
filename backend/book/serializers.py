@@ -24,7 +24,7 @@ class BookSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(many=True, read_only=True)
     language = LanguageSerializer(many=True, read_only=True)
     genre = GenreSerializer(many=True, read_only=True)
-    copies_count = serializers.IntegerField(source="copies.count", read_only=True)
+    copies_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Book
