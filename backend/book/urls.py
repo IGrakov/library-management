@@ -14,5 +14,4 @@ urlpatterns = [
     path("create-book-copy/", views.CreateBookCopyView.as_view(), name="create_book_copy"),
     path("manage-book-copy/<int:pk>/", views.RetrieveDeleteBookCopyView.as_view(), name="manage_book_copy"),
     path("list-book-copy/", views.ListBookCopyView.as_view(), name="list_book_copy"),
-    path("test-queries/", views.testView, name="test_queries"),
 ]
