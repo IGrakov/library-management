@@ -1,11 +1,9 @@
 <script setup lang="ts">
-  import TheHeader from './components/TheHeader.vue'
-  import TheFooter from './components/TheFooter.vue'
+import { RouterView } from "vue-router";
+import Toast from "primevue/toast";
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen">
-    <the-header/>
-    <the-footer/>
-  </div>
+  <Toast />
+  <RouterView />
 </template>

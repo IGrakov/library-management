@@ -1,7 +1,6 @@
 from django.db import models
 from django.db.models import QuerySet
 
-from book.models import BookLoan
 from core.models import TimeStampMixin
 from reference_values.models import Hall
 from user.models import User
@@ -16,7 +15,7 @@ class ReaderCard(TimeStampMixin):
     hall_access = models.ManyToManyField(Hall, related_name="reader_cards", blank=True)
 
     @property
-    def active_loans(self) -> QuerySet[BookLoan]:
+    def active_loans(self) -> QuerySet:
         return self.book_loans.filter(returned_at__isnull=True)
 
     def __str__(self) -> str:

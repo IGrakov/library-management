@@ -13,3 +13,7 @@
 
 /* Tailwind scrollbar plugin */
 @plugin "tailwind-scrollbar";
+
+:deep(.p-datatable-thead > tr > th.text-center) {
+  text-align: center !important;
+}

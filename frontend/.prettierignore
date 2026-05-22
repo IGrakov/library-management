@@ -15,6 +15,7 @@ coverage
 # === 2. Project configuration ===
 .prettierignore
 .prettierrc
+.dockerignore
 eslint.config.js
 postcss.config.cjs
 vite.config.js
@@ -36,6 +37,7 @@ yarn.lock
 
 # === 5. Static assets (not formatted) ===
 src/assets/
+src/public/
 
 # === 6. Misc / temporary ===
 # (Add custom local ignores here if needed)

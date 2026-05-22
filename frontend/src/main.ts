@@ -1,19 +1,27 @@
-import { createApp } from 'vue'
-import { VueQueryPlugin } from '@tanstack/vue-query'
-import App from './App.vue'
-import PrimeVue from 'primevue/config'
-import Aura from '@primeuix/themes/aura'
+import { createApp } from "vue";
+import { VueQueryPlugin, QueryClient, VueQueryPluginOptions } from "@tanstack/vue-query";
+import { createPinia } from "pinia";
+import App from "./App.vue";
+import PrimeVue from "primevue/config";
+import Aura from "@primeuix/themes/aura";
 import "primeicons/primeicons.css"; // icons
+import "./assets/main.css"; // Tailwind CSS
+import router from "@/router";
+import ToastService from "primevue/toastservice";
 
-import './assets/main.css'  // <-- Tailwind CSS
+const app = createApp(App);
 
-const app = createApp(App)
+const queryClient = new QueryClient();
+const vueQueryOptions: VueQueryPluginOptions = { queryClient };
+const pinia = createPinia();
 
 app.use(PrimeVue, {
-    theme: {
-        preset: Aura
-    }
+  theme: {
+    preset: Aura,
+  },
 });
-app.use(VueQueryPlugin)
-
-app.mount("#app")
+app.use(VueQueryPlugin, vueQueryOptions);
+app.use(pinia);
+app.use(router);
+app.use(ToastService);
+app.mount("#app");
