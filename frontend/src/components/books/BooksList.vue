@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { refDebounced } from "@vueuse/core";
+import { computed, ref, watch } from "vue";
 
-import type { DataTableSortEvent } from "primevue/datatable";
-
-import Column from "primevue/column";
-import DataTable from "primevue/datatable";
-
+import BaseDataTable from "@/components/common/BaseDataTable.vue";
+import { useDataTable } from "@/composables/useDataTable";
 import { useBooksQuery } from "@/queries/books.queries";
+import { ColumnConfig } from "@/types/table";
 
-// --- Pagination state
-const page = ref(1);
-const rowsPerPage = ref(10);
+const { page, rowsPerPage, sortField, sortOrder, onPage, onSort } = useDataTable();
 
 // --- Filter state
 const titleFilter = ref("");
@@ -18,11 +15,11 @@ const authorFilter = ref("");
 const languageFilter = ref("");
 const genreFilter = ref("");
 const isbnFilter = ref("");
-
-const sortField = ref<string>();
-const sortOrder = ref<"asc" | "desc">();
-// const sortField = ref<string | keyof Book | ((item: Book) => string) | undefined>();
-// const sortOrder = ref< "asc" | "desc" | undefined>("asc");
+const debouncedTitleFilter = refDebounced(titleFilter, 500);
+const debouncedAuthorFilter = refDebounced(authorFilter, 500);
+const debouncedLanguageFilter = refDebounced(languageFilter, 500);
+const debouncedGenreFilter = refDebounced(genreFilter, 500);
+const debouncedIsbnFilter = refDebounced(isbnFilter, 500);
 
 // --- Map DataTable columns to API fields
 const apiFieldMap: Record<string, string> = {
@@ -36,35 +33,17 @@ const apiFieldMap: Record<string, string> = {
   copiesCount: "copies_count",
 };
 
-function onSort(event: DataTableSortEvent) {
-  if (!event.sortField || event.sortOrder === 0) {
-    sortField.value = undefined;
-    sortOrder.value = undefined;
-  } else {
-    sortField.value = apiFieldMap[event.sortField as string];
-    sortOrder.value = event.sortOrder === 1 ? "asc" : "desc";
-  }
-  page.value = 1;
-}
-
-// --- Handle DataTable page change
-function onPage(event: { page: number; rows: number }) {
-  page.value = event.page + 1; // PrimeVue pages are 0-indexed
-  rowsPerPage.value = event.rows;
-}
-
 const queryParams = computed(() => ({
   page: page.value,
   page_size: rowsPerPage.value,
 
-  title: titleFilter.value || undefined,
-  author: authorFilter.value || undefined,
-  language: languageFilter.value || undefined,
-  genre: genreFilter.value || undefined,
-  isbn: isbnFilter.value || undefined,
+  title: debouncedTitleFilter.value || undefined,
+  author: debouncedAuthorFilter.value || undefined,
+  language: debouncedLanguageFilter.value || undefined,
+  genre: debouncedGenreFilter.value || undefined,
+  isbn: debouncedIsbnFilter.value || undefined,
 
-  sort: sortField.value,
-  order: sortOrder.value,
+  ordering: sortField.value ? `${sortOrder.value === "desc" ? "-" : ""}${sortField.value}` : undefined,
 }));
 
 const booksQuery = useBooksQuery(queryParams);
@@ -86,21 +65,30 @@ const books = computed(() =>
   })),
 );
 
-const totalRecords = computed(() => booksQuery.data?.value?.count ?? 0);
-const isLoading = computed(() => booksQuery.isFetching.value);
-const isError = computed(() => booksQuery.isError.value);
-
 // Define columns
-const columns = [
-  { field: "title", header: "Title", align: "left" },
-  { field: "authorStr", header: "Authors", align: "left" },
-  { field: "languageStr", header: "Languages", align: "left" },
-  { field: "genreStr", header: "Genres", align: "left" },
-  { field: "publishedDate", header: "Published", align: "left" },
-  { field: "pages", header: "Pages", align: "right" },
+const columns: ColumnConfig[] = [
+  { field: "title", header: "Title" },
+  { field: "authorStr", header: "Authors" },
+  { field: "languageStr", header: "Languages" },
+  { field: "genreStr", header: "Genres" },
+  { field: "publishedDate", header: "Published" },
+  { field: "pages", header: "Pages", align: "right", sortable: false },
   { field: "isbn", header: "ISBN", align: "right" },
-  { field: "copiesCount", header: "Number of Copies", align: "right" },
+  { field: "copiesCount", header: "Number of Copies", align: "right", sortable: false },
 ];
+
+watch(
+  () => [
+    debouncedTitleFilter,
+    debouncedAuthorFilter,
+    debouncedLanguageFilter,
+    debouncedGenreFilter,
+    debouncedIsbnFilter,
+  ],
+  () => {
+    page.value = 1;
+  },
+);
 </script>
 
 <template>
@@ -114,46 +102,16 @@ const columns = [
       <input v-model="isbnFilter" placeholder="Filter by ISBN" class="border rounded p-1" />
     </div>
 
-    <div class="min-h-4/5 w-full">
-      <DataTable
-        :value="books"
-        lazy
-        paginator
-        :rows="rowsPerPage"
-        :total-records="totalRecords"
-        :loading="isLoading"
-        responsive-layout="scroll"
-        sort-mode="multiple"
-        class="mt-2"
-        @page="onPage"
-        @sort="onSort"
-      >
-        <Column
-          v-for="col in columns"
-          :key="col.field"
-          :field="col.field"
-          :header="col.header"
-          :sortable="!!col.field"
-          :pt="{
-            columnHeaderContent: {
-              class: 'justify-center',
-            },
-          }"
-          :style="{ textAlign: col.align }"
-        >
-          <template #loading>
-            <div class="h-4 bg-gray-200 rounded"></div>
-          </template>
-        </Column>
-      </DataTable>
-    </div>
-
-    <div v-if="isError" class="text-red-600 mt-2">❌ Error loading books</div>
+    <BaseDataTable
+      :rows="books"
+      :columns="columns"
+      :loading="booksQuery.isFetching.value"
+      :total-records="booksQuery.data.value?.count"
+      :rows-per-page="rowsPerPage"
+      :sort-field="sortField"
+      :sort-order="sortOrder"
+      @page="onPage"
+      @sort="(event) => onSort(event, apiFieldMap)"
+    />
   </div>
 </template>
-
-<style scoped>
-:deep(.p-datatable-thead > tr > th) {
-  @apply text-center align-middle;
-}
-</style>

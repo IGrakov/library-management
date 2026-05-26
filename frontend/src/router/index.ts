@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
 
+import DefaultLayout from "@/components/layouts/DefaultLayout.vue";
+import BookListPage from "@/components/pages/BookListPage.vue";
 import LoginPage from "@/components/pages/LoginPage.vue";
 import RegisterPage from "@/components/pages/RegisterPage.vue";
-import UsersPage from "@/components/pages/UsersPage.vue";
-import BookListPage from "@/components/pages/BookListPage.vue";
-import DefaultLayout from "@/components/layouts/DefaultLayout.vue";
+import UserListPage from "@/components/pages/UserListPage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -22,7 +22,7 @@ const router = createRouter({
     {
       path: "/users",
       name: "users",
-      component: UsersPage,
+      component: UserListPage,
       meta: {
         requiresAuth: true,
       },
@@ -31,6 +31,9 @@ const router = createRouter({
       path: "/books",
       name: "books",
       component: BookListPage,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: "/",

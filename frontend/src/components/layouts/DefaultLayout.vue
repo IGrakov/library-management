@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { VueQueryDevtools } from "@tanstack/vue-query-devtools";
-import TheHeader from "@/components/layouts/TheHeader.vue";
+
 import TheFooter from "@/components/layouts/TheFooter.vue";
+import TheHeader from "@/components/layouts/TheHeader.vue";
 </script>
 
 <template>

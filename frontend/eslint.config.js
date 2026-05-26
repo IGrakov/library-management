@@ -1,9 +1,10 @@
 import js from "@eslint/js";
 import ts from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
+import prettier from "eslint-config-prettier";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
 import vue from "eslint-plugin-vue";
 import vueParser from "vue-eslint-parser";
-import prettier from "eslint-config-prettier";
 
 /**
  * Minimal, stable ESLint flat config for Vue 3 + TS + Vite.
@@ -36,6 +37,7 @@ export default [
     plugins: {
       vue,
       "@typescript-eslint": ts,
+      "simple-import-sort": simpleImportSort,
     },
 
     rules: {
@@ -49,6 +51,9 @@ export default [
       // --- TS-specific ---
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": ["error", { vars: "all", args: "none", ignoreRestSiblings: true }],
+
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error",
 
       // --- Vue adjustments ---
       "vue/html-indent": ["error", 2],

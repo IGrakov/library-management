@@ -10,7 +10,7 @@ export const axiosClient = axios.create({
 
 // auth interceptor
 axiosClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access_token");
+  const token = window.localStorage.getItem("access_token");
 
   if (token) {
     config.headers.Authorization = `Token ${token}`;

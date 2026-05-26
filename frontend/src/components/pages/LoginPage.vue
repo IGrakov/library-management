@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth.store";
-import DefaultLayout from "@/components/layouts/DefaultLayout.vue";
-import { useToast } from "primevue/usetoast";
 import Button from "primevue/button";
 import Card from "primevue/card";
 import InputText from "primevue/inputtext";
 import Password from "primevue/password";
+import { useToast } from "primevue/usetoast";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+import DefaultLayout from "@/components/layouts/DefaultLayout.vue";
+import { useAuthStore } from "@/stores/auth.store";
 
 const router = useRouter();
 
@@ -29,7 +30,7 @@ async function onSubmit() {
   <DefaultLayout>
     <Card class="max-w-xl mx-auto p-6">
       <template #content>
-        <form @submit.prevent="onSubmit" class="flex justify-center flex-col gap-4">
+        <form class="flex justify-center flex-col gap-4" @submit.prevent="onSubmit">
           <div class="flex flex-col gap-1">
             <InputText v-model="email" name="email" type="text" placeholder="Email" class="border p-2 rounded" />
           </div>

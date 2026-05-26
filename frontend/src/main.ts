@@ -1,13 +1,16 @@
-import { createApp } from "vue";
-import { VueQueryPlugin, QueryClient, VueQueryPluginOptions } from "@tanstack/vue-query";
-import { createPinia } from "pinia";
-import App from "./App.vue";
-import PrimeVue from "primevue/config";
-import Aura from "@primeuix/themes/aura";
 import "primeicons/primeicons.css"; // icons
 import "./assets/main.css"; // Tailwind CSS
-import router from "@/router";
+
+import Aura from "@primeuix/themes/aura";
+import { QueryClient, VueQueryPlugin, VueQueryPluginOptions } from "@tanstack/vue-query";
+import { createPinia } from "pinia";
+import PrimeVue from "primevue/config";
 import ToastService from "primevue/toastservice";
+import { createApp } from "vue";
+
+import router from "@/router";
+
+import App from "./App.vue";
 
 const app = createApp(App);
 

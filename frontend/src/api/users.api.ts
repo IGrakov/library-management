@@ -1,21 +1,21 @@
 import { axiosClient } from "@/api/client";
-
-import type { User, CreateUserPayload } from "@/types/users";
+import { AuthUser, CreateUserPayload, PaginatedUsers, UsersQueryParams } from "@/types/users";
 
 export const usersApi = {
-  getAll: async (): Promise<User[]> => {
-    const { data } = await axiosClient.get("/user/list/");
-
+  getAll: async (params?: UsersQueryParams): Promise<PaginatedUsers> => {
+    const { data } = await axiosClient.get("/user/list/", {
+      params,
+    });
     return data;
   },
 
-  create: async (payload: CreateUserPayload): Promise<User> => {
+  create: async (payload: CreateUserPayload): Promise<AuthUser> => {
     const { data } = await axiosClient.post("/user/create/", payload);
 
     return data;
   },
 
-  me: async (): Promise<User> => {
+  me: async (): Promise<AuthUser> => {
     const { data } = await axiosClient.get("/user/manage/");
 
     return data;

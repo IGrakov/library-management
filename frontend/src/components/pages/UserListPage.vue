@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import BooksList from "@/components/books/BooksList.vue";
 import DefaultLayout from "@/components/layouts/DefaultLayout.vue";
+import UsersList from "@/components/users/UsersList.vue";
 </script>
 
 <template>
   <DefaultLayout>
-    <BooksList />
+    <UsersList />
   </DefaultLayout>
 </template>
