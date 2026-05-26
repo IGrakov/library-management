@@ -1,20 +1,20 @@
 from django.db.models import Count
-from django.shortcuts import render
-from django_filters import rest_framework as filters
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import generics, status
+from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny
 
 from book.filters import BookFilter
 from book.models import Author, Book, BookCopy
-from book.pagination import ResultSetPagination
 from book.serializers import (
     AuthorSerializer,
     BookCopySerializer,
     BookSerializer,
     BookWriteSerializer,
 )
+from core.pagination import ResultSetPagination
 from user.permissions import IsAdminOrReadOnly
 
 
@@ -136,9 +136,22 @@ class ListBookView(generics.ListAPIView):
     queryset = Book.objects.prefetch_related("author", "language", "genre").annotate(copies_count=Count("copies"))
     serializer_class = BookSerializer
     pagination_class = ResultSetPagination
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
     filterset_class = BookFilter
     permission_classes = (AllowAny,)
+
+    ordering_fields = (
+        "title",
+        "published_date",
+        "pages",
+        "isbn",
+        "copies_count",
+    )
+
+    order = "title"
 
 
 @extend_schema(

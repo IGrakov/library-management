@@ -25,7 +25,7 @@ class Author(TimeStampMixin):
 class Book(TimeStampMixin):
     """Model for a book"""
 
-    title = models.CharField(max_length=255, null=False, blank=False)
+    title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
     author = models.ManyToManyField(Author, blank=True, related_name="books")
     published_date = models.DateField(null=True, blank=True)
     isbn = models.CharField(max_length=17, null=False, blank=False, unique=True)

@@ -1,16 +1,21 @@
 from typing import Any
 
 from django.db.models import Q, QuerySet
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
+from core.pagination import ResultSetPagination
+
 from . import constants
+from .filters import UserFilter
 from .models import User
 from .permissions import CanCreateOrManageUser, IsLibrarianOrAdmin, get_user_role_rank
 from .serializers import AuthTokenSerializer, UserSerializer
@@ -23,7 +28,7 @@ class CreateUserView(generics.CreateAPIView):
     """
 
     serializer_class = UserSerializer
-    permission_classes = (CanCreateOrManageUser,)
+    permission_classes = (AllowAny,)
 
 
 class CreateTokenView(ObtainAuthToken):
@@ -38,7 +43,7 @@ class CreateTokenView(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         token, _ = Token.objects.get_or_create(user=user)
-        return Response({"token": token.key, "user_id": user.id})
+        return Response({"token": token.key, "user": UserSerializer(user).data})
 
 
 @extend_schema_view(
@@ -72,19 +77,33 @@ class ListUserView(generics.ListAPIView):
     """List users in the system. Permitted only to librarians"""
 
     serializer_class = UserSerializer
+    pagination_class = ResultSetPagination
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+    filterset_class = UserFilter
     permission_classes = (IsLibrarianOrAdmin,)
+
+    ordering_fields = (
+        "last_name",
+        "email",
+    )
+
+    order = "last_name"
 
     def get_queryset(self) -> QuerySet[User]:
         user = self.request.user
+        qs = User.objects.all()
 
         # Superuser sees everything
         if user.is_superuser:
-            return User.objects.all()
+            return qs
 
         # Admin / Librarian see only lower-ranked active users
         actor_rank = get_user_role_rank(user)
 
-        return User.objects.filter(is_active=True).filter(self._lower_rank_q(actor_rank))
+        return qs.filter(is_active=True).filter(self._lower_rank_q(actor_rank))
 
     def _lower_rank_q(self, actor_rank: int) -> Q:
         if actor_rank == constants.ADMIN_USER_RANK:

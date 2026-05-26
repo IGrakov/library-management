@@ -8,15 +8,13 @@ from rest_framework import serializers
 
 from user import constants
 from user.models import User
-from user.permissions import get_user_role_rank
 
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the users object"""
 
-    role = serializers.ChoiceField(
-        choices=[constants.Roles.READER, constants.Roles.LIBRARIAN, constants.Roles.ADMIN],
-        write_only=True,
+    role = serializers.SerializerMethodField(
+        # choices=[constants.Roles.READER, constants.Roles.LIBRARIAN, constants.Roles.ADMIN],
     )
 
     class Meta:
@@ -38,16 +36,16 @@ class UserSerializer(serializers.ModelSerializer):
         request = self.context["request"]
         creator = request.user
 
-        if role == constants.Roles.LIBRARIAN:
-            if get_user_role_rank(creator) < constants.ADMIN_USER_RANK:
-                raise serializers.ValidationError("Only admin can create librarian")  # noqa: EM101, TRY003
-
-        elif role == constants.Roles.READER:
-            if get_user_role_rank(creator) < constants.LIBRARIAN_USER_RANK:
-                raise serializers.ValidationError("Only librarian or admin can create regular users")  # noqa: EM101, TRY003
-
-        else:
-            raise serializers.ValidationError("Invalid role")  # noqa: EM101, TRY003
+        # if role == constants.Roles.LIBRARIAN:
+        #     if get_user_role_rank(creator) < constants.ADMIN_USER_RANK:
+        #         raise serializers.ValidationError("Only admin can create librarian")
+        #
+        # elif role == constants.Roles.READER:
+        #     if get_user_role_rank(creator) < constants.LIBRARIAN_USER_RANK:
+        #         raise serializers.ValidationError("Only librarian or admin can create regular users")
+        #
+        # else:
+        #     raise serializers.ValidationError("Invalid role")
 
         user = get_user_model().objects.create_user(**validated_data)
 

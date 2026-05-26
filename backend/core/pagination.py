@@ -1,6 +1,6 @@
 from rest_framework.pagination import PageNumberPagination
 
-from book.constants import NUM_OF_ITEMS_PER_PAGE
+from core.constants import NUM_OF_ITEMS_PER_PAGE
 
 
 class ResultSetPagination(PageNumberPagination):

@@ -4,10 +4,10 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from book.constants import NUM_OF_ITEMS_PER_PAGE
 from book.factories import AuthorFactory, BookFactory
 from book.models import Book
 from book.serializers import AuthorSerializer
+from core.constants import NUM_OF_ITEMS_PER_PAGE
 from reference_values.factories import GenreFactory, LanguageFactory
 from reference_values.serializers import GenreSerializer, LanguageSerializer
 from user import constants
