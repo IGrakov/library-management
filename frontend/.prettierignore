@@ -37,7 +37,7 @@ yarn.lock
 
 # === 5. Static assets (not formatted) ===
 src/assets/
-src/public/
+public/
 
 # === 6. Misc / temporary ===
 # (Add custom local ignores here if needed)

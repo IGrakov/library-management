@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { refDebounced } from "@vueuse/core";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
 import BaseDataTable from "@/components/common/BaseDataTable.vue";
 import { useDataTable } from "@/composables/useDataTable";
+import { useDebouncedFilters } from "@/composables/useDebouncedFilters";
 import { useBooksQuery } from "@/queries/books.queries";
 import { ColumnConfig } from "@/types/table";
 
@@ -15,11 +15,21 @@ const authorFilter = ref("");
 const languageFilter = ref("");
 const genreFilter = ref("");
 const isbnFilter = ref("");
-const debouncedTitleFilter = refDebounced(titleFilter, 500);
-const debouncedAuthorFilter = refDebounced(authorFilter, 500);
-const debouncedLanguageFilter = refDebounced(languageFilter, 500);
-const debouncedGenreFilter = refDebounced(genreFilter, 500);
-const debouncedIsbnFilter = refDebounced(isbnFilter, 500);
+
+// Debounced filtering
+const { cleanedFilters } = useDebouncedFilters(
+  {
+    title: titleFilter,
+    author: authorFilter,
+    language: languageFilter,
+    genre: genreFilter,
+    isbn: isbnFilter,
+  },
+  {
+    page,
+    delay: 500,
+  },
+);
 
 // --- Map DataTable columns to API fields
 const apiFieldMap: Record<string, string> = {
@@ -37,11 +47,7 @@ const queryParams = computed(() => ({
   page: page.value,
   page_size: rowsPerPage.value,
 
-  title: debouncedTitleFilter.value || undefined,
-  author: debouncedAuthorFilter.value || undefined,
-  language: debouncedLanguageFilter.value || undefined,
-  genre: debouncedGenreFilter.value || undefined,
-  isbn: debouncedIsbnFilter.value || undefined,
+  ...cleanedFilters.value,
 
   ordering: sortField.value ? `${sortOrder.value === "desc" ? "-" : ""}${sortField.value}` : undefined,
 }));
@@ -76,19 +82,6 @@ const columns: ColumnConfig[] = [
   { field: "isbn", header: "ISBN", align: "right" },
   { field: "copiesCount", header: "Number of Copies", align: "right", sortable: false },
 ];
-
-watch(
-  () => [
-    debouncedTitleFilter,
-    debouncedAuthorFilter,
-    debouncedLanguageFilter,
-    debouncedGenreFilter,
-    debouncedIsbnFilter,
-  ],
-  () => {
-    page.value = 1;
-  },
-);
 </script>
 
 <template>

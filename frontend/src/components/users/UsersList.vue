@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { refDebounced } from "@vueuse/core";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
 import BaseDataTable from "@/components/common/BaseDataTable.vue";
 import { useDataTable } from "@/composables/useDataTable";
+import { useDebouncedFilters } from "@/composables/useDebouncedFilters";
 import { useUsersQuery } from "@/queries/user.queries";
 import { ColumnConfig } from "@/types/table";
 
@@ -13,9 +13,19 @@ const { page, rowsPerPage, sortField, sortOrder, onPage, onSort } = useDataTable
 const nameFilter = ref("");
 const emailFilter = ref("");
 const roleFilter = ref("");
-const debouncedNameFilter = refDebounced(nameFilter, 500);
-const debouncedEmailFilter = refDebounced(emailFilter, 500);
-const debouncedRoleFilter = refDebounced(roleFilter, 500);
+
+// Debounced filtering
+const { cleanedFilters } = useDebouncedFilters(
+  {
+    name: nameFilter,
+    email: emailFilter,
+    role: roleFilter,
+  },
+  {
+    page,
+    delay: 500,
+  },
+);
 
 // --- Map DataTable columns to API fields
 const apiFieldMap: Record<string, string> = {
@@ -28,9 +38,7 @@ const queryParams = computed(() => ({
   page: page.value,
   page_size: rowsPerPage.value,
 
-  email: debouncedEmailFilter.value || undefined,
-  name: debouncedNameFilter.value || undefined,
-  role: debouncedRoleFilter.value || undefined,
+  ...cleanedFilters.value,
 
   ordering: sortField.value ? `${sortOrder.value === "desc" ? "-" : ""}${sortField.value}` : undefined,
 }));
@@ -50,13 +58,6 @@ const columns: ColumnConfig[] = [
   { field: "nameStr", header: "Name" },
   { field: "role", header: "Role", sortable: false },
 ];
-
-watch(
-  () => [debouncedNameFilter, debouncedEmailFilter, debouncedRoleFilter],
-  () => {
-    page.value = 1;
-  },
-);
 </script>
 
 <template>
