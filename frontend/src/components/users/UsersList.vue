@@ -30,7 +30,7 @@ const { cleanedFilters } = useDebouncedFilters(
 // --- Map DataTable columns to API fields
 const apiFieldMap: Record<string, string> = {
   email: "email",
-  nameStr: "last_name",
+  nameStr: "full_name",
   role: "role",
 };
 
