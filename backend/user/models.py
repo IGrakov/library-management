@@ -55,3 +55,11 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}, {self.email}"
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["last_name", "first_name"],
+                name="user_last_first_name_idx",
+            ),
+        ]
