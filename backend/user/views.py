@@ -86,24 +86,36 @@ class ListUserView(generics.ListAPIView):
     permission_classes = (IsLibrarianOrAdmin,)
 
     ordering_fields = (
-        "last_name",
         "email",
+        "last_name",
+        "first_name",
     )
 
-    order = "last_name"
+    order = (
+        "last_name",
+        "first_name",
+    )
 
     def get_queryset(self) -> QuerySet[User]:
         user = self.request.user
         qs = User.objects.all()
 
         # Superuser sees everything
-        if user.is_superuser:
-            return qs
+        if not user.is_superuser:
+            # Admin / Librarian see only lower-ranked active users
+            actor_rank = get_user_role_rank(user)
 
-        # Admin / Librarian see only lower-ranked active users
-        actor_rank = get_user_role_rank(user)
+            qs = qs.filter(is_active=True).filter(self._lower_rank_q(actor_rank))
 
-        return qs.filter(is_active=True).filter(self._lower_rank_q(actor_rank))
+        ordering = self.request.query_params.get("ordering")
+
+        if ordering == "full_name":
+            qs = qs.order_by("last_name", "first_name")
+
+        elif ordering == "-full_name":
+            qs = qs.order_by("-last_name", "-first_name")
+
+        return qs
 
     def _lower_rank_q(self, actor_rank: int) -> Q:
         if actor_rank == constants.ADMIN_USER_RANK:
