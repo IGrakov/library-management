@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import DefaultLayout from "@/components/layouts/DefaultLayout.vue";
 import BookListPage from "@/components/pages/BookListPage.vue";
+import hallListPage from "@/components/pages/HallListPage.vue";
 import LoginPage from "@/components/pages/LoginPage.vue";
 import RegisterPage from "@/components/pages/RegisterPage.vue";
 import UserListPage from "@/components/pages/UserListPage.vue";
@@ -31,6 +32,14 @@ const router = createRouter({
       path: "/books",
       name: "books",
       component: BookListPage,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/halls",
+      name: "halls",
+      component: hallListPage,
       meta: {
         requiresAuth: true,
       },

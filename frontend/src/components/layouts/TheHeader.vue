@@ -14,6 +14,8 @@ const isUsersPage = computed(() => route.name === "users");
 
 const isBooksPage = computed(() => route.name === "books");
 
+const isHallsPage = computed(() => route.name === "halls");
+
 const isLoginPage = computed(() => route.name === "login");
 
 const isRegisterPage = computed(() => route.name === "register");
@@ -46,6 +48,15 @@ const isRegisterPage = computed(() => route.name === "register");
                 class="block py-2 pr-4 pl-3 text-gray-700 hover:text-primary-700"
               >
                 Books
+              </RouterLink>
+            </li>
+            <li>
+              <RouterLink
+                v-if="!isHallsPage"
+                to="/halls"
+                class="block py-2 pr-4 pl-3 text-gray-700 hover:text-primary-700"
+              >
+                Halls
               </RouterLink>
             </li>
           </ul>

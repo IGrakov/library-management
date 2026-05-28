@@ -5,6 +5,7 @@ import Aura from "@primeuix/themes/aura";
 import { QueryClient, VueQueryPlugin, VueQueryPluginOptions } from "@tanstack/vue-query";
 import { createPinia } from "pinia";
 import PrimeVue from "primevue/config";
+import ConfirmationService from "primevue/confirmationservice";
 import ToastService from "primevue/toastservice";
 import { createApp } from "vue";
 
@@ -22,9 +23,11 @@ app.use(PrimeVue, {
   theme: {
     preset: Aura,
   },
+  ripple: false,
 });
 app.use(VueQueryPlugin, vueQueryOptions);
 app.use(pinia);
 app.use(router);
 app.use(ToastService);
+app.use(ConfirmationService);
 app.mount("#app");
