@@ -62,6 +62,7 @@ class ListAuthorView(generics.ListAPIView):
 
     serializer_class = AuthorSerializer
     queryset = Author.objects.all()
+    pagination_class = ResultSetPagination
 
 
 @extend_schema_view(
@@ -192,3 +193,4 @@ class ListBookCopyView(generics.ListAPIView):
 
     serializer_class = BookCopySerializer
     queryset = BookCopy.objects.select_related("book").prefetch_related("book__author", "book__language", "book__genre")
+    pagination_class = ResultSetPagination

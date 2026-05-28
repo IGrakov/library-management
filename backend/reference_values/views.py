@@ -1,6 +1,10 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics
+from rest_framework.filters import OrderingFilter
 
+from core.pagination import ResultSetPagination
+from reference_values.filters import HallFilter
 from reference_values.models import Genre, Hall, Language
 from reference_values.serializers import (
     GenreSerializer,
@@ -54,6 +58,7 @@ class ListLanguageView(generics.ListAPIView):
 
     serializer_class = LanguageSerializer
     queryset = Language.objects.all()
+    pagination_class = ResultSetPagination
 
 
 @extend_schema(
@@ -100,6 +105,7 @@ class ListGenreView(generics.ListAPIView):
 
     serializer_class = GenreSerializer
     queryset = Genre.objects.all()
+    pagination_class = ResultSetPagination
 
 
 @extend_schema(
@@ -146,3 +152,16 @@ class ListHallView(generics.ListAPIView):
 
     serializer_class = HallSerializer
     queryset = Hall.objects.all()
+    pagination_class = ResultSetPagination
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+    filterset_class = HallFilter
+
+    ordering_fields = (
+        "id",
+        "name",
+    )
+
+    order = "id"
