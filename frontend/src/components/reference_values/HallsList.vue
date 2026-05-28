@@ -146,7 +146,7 @@ async function onDeleteHall(id: number) {
 <template>
   <div class="card p-4">
     <div class="flex justify-center gap-4 mb-4">
-      <input v-model="nameFilter" placeholder="Filter by hall name" class="border rounded p-1" />
+      <InputText v-model="nameFilter" placeholder="Filter by hall name" class="border rounded p-1" />
       <Button icon="pi pi-plus" severity="success" @click="openCreateDialog" />
     </div>
 

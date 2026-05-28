@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import InputText from "primevue/inputtext";
 import { computed, ref } from "vue";
 
 import BaseDataTable from "@/components/common/BaseDataTable.vue";
@@ -64,9 +65,9 @@ const columns: ColumnConfig[] = [
   <div class="card p-4">
     <!-- Filters -->
     <div class="flex justify-center gap-4 mb-4">
-      <input v-model="emailFilter" placeholder="Filter by email" class="border rounded p-1" />
-      <input v-model="nameFilter" placeholder="Filter by name" class="border rounded p-1" />
-      <input v-model="roleFilter" placeholder="Filter by role" class="border rounded p-1" />
+      <InputText v-model="emailFilter" placeholder="Filter by email" class="border rounded p-1" />
+      <InputText v-model="nameFilter" placeholder="Filter by name" class="border rounded p-1" />
+      <InputText v-model="roleFilter" placeholder="Filter by role" class="border rounded p-1" />
     </div>
 
     <BaseDataTable

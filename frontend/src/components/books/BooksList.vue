@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import InputText from "primevue/inputtext";
 import { computed, ref } from "vue";
 
 import BaseDataTable from "@/components/common/BaseDataTable.vue";
@@ -88,11 +89,11 @@ const columns: ColumnConfig[] = [
   <div class="card p-4">
     <!-- Filters -->
     <div class="flex justify-center gap-4 mb-4">
-      <input v-model="titleFilter" placeholder="Filter by title" class="border rounded p-1" />
-      <input v-model="authorFilter" placeholder="Filter by author" class="border rounded p-1" />
-      <input v-model="languageFilter" placeholder="Filter by language" class="border rounded p-1" />
-      <input v-model="genreFilter" placeholder="Filter by genre" class="border rounded p-1" />
-      <input v-model="isbnFilter" placeholder="Filter by ISBN" class="border rounded p-1" />
+      <InputText v-model="titleFilter" placeholder="Filter by title" class="border rounded p-1" />
+      <InputText v-model="authorFilter" placeholder="Filter by author" class="border rounded p-1" />
+      <InputText v-model="languageFilter" placeholder="Filter by language" class="border rounded p-1" />
+      <InputText v-model="genreFilter" placeholder="Filter by genre" class="border rounded p-1" />
+      <InputText v-model="isbnFilter" placeholder="Filter by ISBN" class="border rounded p-1" />
     </div>
 
     <BaseDataTable

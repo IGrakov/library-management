@@ -1,85 +1,116 @@
 <script setup lang="ts">
+import Button from "primevue/button";
+import Menubar from "primevue/menubar";
+import { MenuItem } from "primevue/menuitem";
 import { computed } from "vue";
-import { RouterLink, useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 import { useAuthStore } from "@/stores/auth.store";
 
 const route = useRoute();
+const router = useRouter();
 
 const authStore = useAuthStore();
 
 const isAuthenticated = computed(() => !!authStore.token);
 
-const isUsersPage = computed(() => route.name === "users");
+const userRole = computed(() => authStore.user?.role);
 
-const isBooksPage = computed(() => route.name === "books");
+const menuItems = computed<MenuItem[]>(() => {
+  if (!isAuthenticated.value) {
+    return [];
+  }
 
-const isHallsPage = computed(() => route.name === "halls");
+  const menu: MenuItem[] = [
+    {
+      label: "Books",
+      icon: "pi pi-book",
 
-const isLoginPage = computed(() => route.name === "login");
+      class: route.path === "/books" ? "active-menu-item" : "",
 
-const isRegisterPage = computed(() => route.name === "register");
+      command: () => navigateTo("/books"),
+    },
+  ];
+
+  if (["admin", "librarian"].includes(userRole.value?.toLowerCase() ?? "")) {
+    menu.push({
+      label: "Users",
+      icon: "pi pi-users",
+
+      class: route.path === "/users" ? "active-menu-item" : "",
+
+      command: () => navigateTo("/users"),
+    });
+  }
+
+  if (["admin", "librarian"].includes(userRole.value?.toLowerCase() ?? "")) {
+    menu.push({
+      label: "Reference Values",
+      icon: "pi pi-list",
+      items: [
+        {
+          label: "Halls",
+          icon: "pi pi-building",
+
+          class: route.path === "/halls" ? "active-menu-item" : "",
+
+          command: () => navigateTo("/halls"),
+        },
+        {
+          label: "Genres",
+          icon: "pi pi-tags",
+
+          class: route.path === "/genres" ? "active-menu-item" : "",
+
+          command: () => navigateTo("/genres"),
+        },
+        {
+          label: "Languages",
+          icon: "pi pi-language",
+
+          class: route.path === "/languages" ? "active-menu-item" : "",
+
+          command: () => navigateTo("/languages"),
+        },
+      ],
+    });
+  }
+
+  return menu;
+});
+
+function navigateTo(path: string) {
+  if (route.path !== path) {
+    router.push(path);
+  }
+}
+
+function logout() {
+  authStore.logout();
+
+  router.push("/login");
+}
 </script>
 
 <template>
-  <header>
-    <nav class="bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800">
-      <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
-        <!-- Left side menu -->
-        <div
-          v-if="isAuthenticated"
-          id="mobile-menu-2"
-          class="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-1"
-        >
-          <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
-            <li>
-              <RouterLink
-                v-if="!isUsersPage"
-                to="/users"
-                class="block py-2 pr-4 pl-3 text-gray-700 hover:text-primary-700"
-              >
-                Users
-              </RouterLink>
-            </li>
-            <li>
-              <RouterLink
-                v-if="!isBooksPage"
-                to="/books"
-                class="block py-2 pr-4 pl-3 text-gray-700 hover:text-primary-700"
-              >
-                Books
-              </RouterLink>
-            </li>
-            <li>
-              <RouterLink
-                v-if="!isHallsPage"
-                to="/halls"
-                class="block py-2 pr-4 pl-3 text-gray-700 hover:text-primary-700"
-              >
-                Halls
-              </RouterLink>
-            </li>
-          </ul>
-        </div>
-        <!-- Right side -->
-        <div v-if="!isAuthenticated" class="flex items-center lg:order-2">
-          <RouterLink
-            v-if="!isLoginPage"
-            to="/login"
-            class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800"
-          >
-            Log in
-          </RouterLink>
+  <div class="m-4">
+    <Menubar :model="menuItems">
+      <template #end>
+        <div class="flex items-center gap-2">
+          <span v-if="authStore.user">
+            {{ authStore.user.first_name }}
+            {{ authStore.user.last_name }}
+          </span>
 
-          <RouterLink
-            v-if="!isRegisterPage"
-            to="/register"
-            class="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800"
-          >
-            Register
-          </RouterLink>
+          <Button v-if="isAuthenticated" label="Logout" icon="pi pi-sign-out" text @click="logout" />
+
+          <template v-else>
+            <Button label="Login" text @click="router.push('/login')" />
+
+            <Button label="Register" text @click="router.push('/register')" />
+          </template>
         </div>
-      </div>
-    </nav>
-  </header>
+      </template>
+    </Menubar>
+  </div>
 </template>
