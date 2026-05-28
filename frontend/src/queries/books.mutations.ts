@@ -1,18 +1,8 @@
-import { useMutation, useQueryClient } from "@tanstack/vue-query";
-
 import { booksApi } from "@/api/books.api";
+import { useCreateMutation } from "@/composables/useBaseMutations";
 import { queryKeys } from "@/queries/queryKeys";
+import { Book, CreateBookPayload } from "@/types/books";
 
 export function useCreateBook() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: booksApi.create,
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.books,
-      });
-    },
-  });
+  return useCreateMutation<CreateBookPayload, Book>(queryKeys.books, booksApi.create);
 }

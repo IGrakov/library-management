@@ -39,5 +39,5 @@ export interface UsersQueryParams {
   email?: string;
   role?: string;
   sort?: string;
-  order?: "asc" | "desc";
+  ordering?: string;
 }

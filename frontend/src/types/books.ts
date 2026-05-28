@@ -1,11 +1,5 @@
-export interface Book {
+export interface Book extends CreateBookPayload {
   id: number;
-  title: string;
-  author: { first_name: string; last_name: string }[];
-  language: { name: string }[];
-  genre: { name: string }[];
-  published_date: string;
-  pages: number;
   copies_count: number;
 }
 
@@ -18,6 +12,10 @@ export interface PaginatedBooks {
 
 export interface CreateBookPayload {
   title: string;
+  author: { first_name: string; last_name: string }[];
+  language: { name: string }[];
+  genre: { name: string }[];
+  published_date: string;
   pages: number;
 }
 
@@ -30,5 +28,5 @@ export interface BooksQueryParams {
   genre?: string;
   isbn?: string;
   sort?: string;
-  order?: "asc" | "desc";
+  ordering?: string;
 }
