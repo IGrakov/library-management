@@ -8,6 +8,7 @@ from rest_framework import serializers
 
 from user import constants
 from user.models import User
+from user.permissions import get_user_role_rank
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -36,16 +37,16 @@ class UserSerializer(serializers.ModelSerializer):
         request = self.context["request"]
         creator = request.user
 
-        # if role == constants.Roles.LIBRARIAN:
-        #     if get_user_role_rank(creator) < constants.ADMIN_USER_RANK:
-        #         raise serializers.ValidationError("Only admin can create librarian")
-        #
-        # elif role == constants.Roles.READER:
-        #     if get_user_role_rank(creator) < constants.LIBRARIAN_USER_RANK:
-        #         raise serializers.ValidationError("Only librarian or admin can create regular users")
-        #
-        # else:
-        #     raise serializers.ValidationError("Invalid role")
+        if role == constants.Roles.LIBRARIAN:
+            if get_user_role_rank(creator) < constants.ADMIN_USER_RANK:
+                raise serializers.ValidationError("Only admin can create librarian")
+
+        elif role == constants.Roles.READER:
+            if get_user_role_rank(creator) < constants.LIBRARIAN_USER_RANK:
+                raise serializers.ValidationError("Only librarian or admin can create regular users")
+
+        else:
+            raise serializers.ValidationError("Invalid role")
 
         user = get_user_model().objects.create_user(**validated_data)
 
