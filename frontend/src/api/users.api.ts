@@ -1,8 +1,8 @@
 import { axiosClient } from "@/api/client";
-import { AuthUser, CreateUserPayload, PaginatedUsers, UsersQueryParams } from "@/types/users";
+import { AuthUser, CreateUserPayload, PaginatedUsers, UserQueryParams } from "@/types/users";
 
 export const usersApi = {
-  getAll: async (params?: UsersQueryParams): Promise<PaginatedUsers> => {
+  getAll: async (params?: UserQueryParams): Promise<PaginatedUsers> => {
     const { data } = await axiosClient.get("/user/list/", {
       params,
     });

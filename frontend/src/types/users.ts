@@ -32,7 +32,7 @@ export interface PaginatedUsers {
   results: AuthUser[];
 }
 
-export interface UsersQueryParams {
+export interface UserQueryParams {
   page?: number;
   page_size?: number;
   name?: string;

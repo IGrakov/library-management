@@ -19,7 +19,7 @@ export interface CreateBookPayload {
   pages: number;
 }
 
-export interface BooksQueryParams {
+export interface BookQueryParams {
   page?: number;
   page_size?: number;
   title?: string;

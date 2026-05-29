@@ -1,8 +1,8 @@
 import { axiosClient } from "@/api/client";
-import { CreateOrUpdateHallPayload, Hall, HallsQueryParams, PaginatedHalls } from "@/types/halls";
+import { CreateOrUpdateHallPayload, Hall, HallQueryParams, PaginatedHalls } from "@/types/halls";
 
 export const hallsApi = {
-  getAll: async (params?: HallsQueryParams): Promise<PaginatedHalls> => {
+  getAll: async (params?: HallQueryParams): Promise<PaginatedHalls> => {
     const { data } = await axiosClient.get("/reference-value/list-hall/", {
       params,
     });

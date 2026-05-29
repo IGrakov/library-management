@@ -1,8 +1,8 @@
 import { axiosClient } from "@/api/client";
-import { Book, BooksQueryParams, CreateBookPayload, PaginatedBooks } from "@/types/books";
+import { Book, BookQueryParams, CreateBookPayload, PaginatedBooks } from "@/types/books";
 
 export const booksApi = {
-  getAll: async (params?: BooksQueryParams): Promise<PaginatedBooks> => {
+  getAll: async (params?: BookQueryParams): Promise<PaginatedBooks> => {
     const { data } = await axiosClient.get("/book/list-book/", {
       params,
     });

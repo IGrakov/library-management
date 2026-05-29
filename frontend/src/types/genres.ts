@@ -1,20 +1,20 @@
-export interface Hall {
+export interface Genre {
   id: number;
   name: string;
 }
 
-export interface PaginatedHalls {
+export interface PaginatedGenres {
   count: number;
   next: string | null;
   previous: string | null;
-  results: Hall[];
+  results: Genre[];
 }
 
-export interface CreateOrUpdateHallPayload {
+export interface CreateOrUpdateGenrePayload {
   name: string;
 }
 
-export interface HallQueryParams {
+export interface GenreQueryParams {
   page?: number;
   page_size?: number;
   name?: string;
