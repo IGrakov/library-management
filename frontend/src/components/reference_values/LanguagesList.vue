@@ -1,18 +1,23 @@
 <script setup lang="ts">
+import { isAxiosError } from "axios";
 import Button from "primevue/button";
 import ConfirmDialog from "primevue/confirmdialog";
-import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
 import { useConfirm } from "primevue/useconfirm";
 import { computed, ref } from "vue";
 
 import BaseDataTable from "@/components/common/BaseDataTable.vue";
+import BaseDialog from "@/components/common/BaseDialog.vue";
+import BaseFormField from "@/components/common/BaseFormField.vue";
 import { useDataTable } from "@/composables/useDataTable";
 import { useDebouncedFilters } from "@/composables/useDebouncedFilters";
+import { useForm } from "@/composables/useForm";
 import { useCreateLanguage, useDeleteLanguage, useUpdateLanguage } from "@/queries/languages.mutations";
 import { useLanguagesQuery } from "@/queries/languages.queries";
 import { Language } from "@/types/languages";
 import { ColumnConfig } from "@/types/table";
+
+const { fieldErrors, generalError, clearErrors, setBackendErrors } = useForm();
 
 const { page, rowsPerPage, sortField, sortOrder, onPage, onSort } = useDataTable();
 
@@ -93,6 +98,7 @@ const columns: ColumnConfig[] = [
 
 // Create / Edit
 function openCreateDialog() {
+  clearErrors();
   editingLanguage.value = null;
 
   languageName.value = "";
@@ -103,6 +109,7 @@ function openCreateDialog() {
 }
 
 function openEditDialog(language: Language) {
+  clearErrors();
   editingLanguage.value = language;
 
   languageName.value = language.name;
@@ -113,25 +120,35 @@ function openEditDialog(language: Language) {
 }
 
 async function saveLanguage() {
-  if (editingLanguage.value) {
-    await updateLanguageMutation.mutateAsync({
-      id: editingLanguage.value.id,
+  clearErrors();
 
-      payload: {
+  try {
+    if (editingLanguage.value) {
+      await updateLanguageMutation.mutateAsync({
+        id: editingLanguage.value.id,
+
+        payload: {
+          name: languageName.value,
+          three_letter_code: threeLetterCodeRef.value,
+          two_letter_code: twoLetterCodeRef.value,
+        },
+      });
+    } else {
+      await createLanguageMutation.mutateAsync({
         name: languageName.value,
         three_letter_code: threeLetterCodeRef.value,
         two_letter_code: twoLetterCodeRef.value,
-      },
-    });
-  } else {
-    await createLanguageMutation.mutateAsync({
-      name: languageName.value,
-      three_letter_code: threeLetterCodeRef.value,
-      two_letter_code: twoLetterCodeRef.value,
-    });
-  }
+      });
+    }
 
-  isDialogVisible.value = false;
+    isDialogVisible.value = false;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      setBackendErrors(error);
+    } else {
+      generalError.value = "Unexpected error occurred.";
+    }
+  }
 }
 
 async function onDeleteLanguage(id: number) {
@@ -189,28 +206,24 @@ async function onDeleteLanguage(id: number) {
       </template>
     </BaseDataTable>
   </div>
-  <Dialog
+  <BaseDialog
     v-model:visible="isDialogVisible"
-    modal
-    :header="editingLanguage ? 'Edit Language' : 'Create Language'"
-    class="w-sm"
+    :title="editingLanguage ? 'Edit Language' : 'Create Language'"
+    :submit-label="editingLanguage ? 'Save' : 'Create'"
+    :loading="createLanguageMutation.isPending.value || updateLanguageMutation.isPending.value"
+    @submit="saveLanguage"
   >
-    <div class="flex flex-col gap-4">
+    <BaseFormField :error="fieldErrors.name">
       <InputText v-model="languageName" placeholder="Language name" />
-      <InputText v-model="threeLetterCodeRef" placeholder="Language three letter code" />
-      <InputText v-model="twoLetterCodeRef" placeholder="Language two letter code" />
+    </BaseFormField>
 
-      <div class="flex justify-end gap-2">
-        <Button label="Cancel" severity="secondary" @click="isDialogVisible = false" />
+    <BaseFormField :error="fieldErrors.three_letter_code">
+      <InputText v-model="threeLetterCodeRef" placeholder="Three letter code" />
+    </BaseFormField>
 
-        <Button
-          :label="editingLanguage ? 'Save' : 'Create'"
-          :severity="editingLanguage ? 'info' : 'success'"
-          :loading="createLanguageMutation.isPending.value || updateLanguageMutation.isPending.value"
-          @click="saveLanguage"
-        />
-      </div>
-    </div>
-  </Dialog>
+    <BaseFormField :error="fieldErrors.two_letter_code">
+      <InputText v-model="twoLetterCodeRef" placeholder="Two letter code" />
+    </BaseFormField>
+  </BaseDialog>
   <ConfirmDialog />
 </template>

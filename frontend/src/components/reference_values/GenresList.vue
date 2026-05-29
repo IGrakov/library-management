@@ -1,18 +1,23 @@
 <script setup lang="ts">
+import { isAxiosError } from "axios";
 import Button from "primevue/button";
 import ConfirmDialog from "primevue/confirmdialog";
-import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
 import { useConfirm } from "primevue/useconfirm";
 import { computed, ref } from "vue";
 
 import BaseDataTable from "@/components/common/BaseDataTable.vue";
+import BaseDialog from "@/components/common/BaseDialog.vue";
+import BaseFormField from "@/components/common/BaseFormField.vue";
 import { useDataTable } from "@/composables/useDataTable";
 import { useDebouncedFilters } from "@/composables/useDebouncedFilters";
+import { useForm } from "@/composables/useForm";
 import { useCreateGenre, useDeleteGenre, useUpdateGenre } from "@/queries/genres.mutations";
 import { useGenresQuery } from "@/queries/genres.queries";
 import { Genre } from "@/types/genres";
 import { ColumnConfig } from "@/types/table";
+
+const { fieldErrors, generalError, clearErrors, setBackendErrors } = useForm();
 
 const { page, rowsPerPage, sortField, sortOrder, onPage, onSort } = useDataTable();
 
@@ -82,6 +87,7 @@ const columns: ColumnConfig[] = [
 
 // Create / Edit
 function openCreateDialog() {
+  clearErrors();
   editingGenre.value = null;
 
   genreName.value = "";
@@ -90,6 +96,7 @@ function openCreateDialog() {
 }
 
 function openEditDialog(genre: Genre) {
+  clearErrors();
   editingGenre.value = genre;
 
   genreName.value = genre.name;
@@ -98,21 +105,31 @@ function openEditDialog(genre: Genre) {
 }
 
 async function saveGenre() {
-  if (editingGenre.value) {
-    await updateGenreMutation.mutateAsync({
-      id: editingGenre.value.id,
+  clearErrors();
 
-      payload: {
+  try {
+    if (editingGenre.value) {
+      await updateGenreMutation.mutateAsync({
+        id: editingGenre.value.id,
+
+        payload: {
+          name: genreName.value,
+        },
+      });
+    } else {
+      await createGenreMutation.mutateAsync({
         name: genreName.value,
-      },
-    });
-  } else {
-    await createGenreMutation.mutateAsync({
-      name: genreName.value,
-    });
-  }
+      });
+    }
 
-  isDialogVisible.value = false;
+    isDialogVisible.value = false;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      setBackendErrors(error);
+    } else {
+      generalError.value = "Unexpected error occurred.";
+    }
+  }
 }
 
 async function onDeleteGenre(id: number) {
@@ -169,21 +186,16 @@ async function onDeleteGenre(id: number) {
       </template>
     </BaseDataTable>
   </div>
-  <Dialog v-model:visible="isDialogVisible" modal :header="editingGenre ? 'Edit Genre' : 'Create Genre'" class="w-sm">
-    <div class="flex flex-col gap-4">
+  <BaseDialog
+    v-model:visible="isDialogVisible"
+    :title="editingGenre ? 'Edit Genre' : 'Create Genre'"
+    :submit-label="editingGenre ? 'Save' : 'Create'"
+    :loading="createGenreMutation.isPending.value || updateGenreMutation.isPending.value"
+    @submit="saveGenre"
+  >
+    <BaseFormField :error="fieldErrors.name">
       <InputText v-model="genreName" placeholder="Genre name" />
-
-      <div class="flex justify-end gap-2">
-        <Button label="Cancel" severity="secondary" @click="isDialogVisible = false" />
-
-        <Button
-          :label="editingGenre ? 'Save' : 'Create'"
-          :severity="editingGenre ? 'info' : 'success'"
-          :loading="createGenreMutation.isPending.value || updateGenreMutation.isPending.value"
-          @click="saveGenre"
-        />
-      </div>
-    </div>
-  </Dialog>
+    </BaseFormField>
+  </BaseDialog>
   <ConfirmDialog />
 </template>

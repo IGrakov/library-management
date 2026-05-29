@@ -1,18 +1,23 @@
 <script setup lang="ts">
+import { isAxiosError } from "axios";
 import Button from "primevue/button";
 import ConfirmDialog from "primevue/confirmdialog";
-import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
 import { useConfirm } from "primevue/useconfirm";
 import { computed, ref } from "vue";
 
 import BaseDataTable from "@/components/common/BaseDataTable.vue";
+import BaseDialog from "@/components/common/BaseDialog.vue";
+import BaseFormField from "@/components/common/BaseFormField.vue";
 import { useDataTable } from "@/composables/useDataTable";
 import { useDebouncedFilters } from "@/composables/useDebouncedFilters";
+import { useForm } from "@/composables/useForm";
 import { useCreateHall, useDeleteHall, useUpdateHall } from "@/queries/halls.mutations";
 import { useHallsQuery } from "@/queries/halls.queries";
 import { Hall } from "@/types/halls";
 import { ColumnConfig } from "@/types/table";
+
+const { fieldErrors, generalError, clearErrors, setBackendErrors } = useForm();
 
 const { page, rowsPerPage, sortField, sortOrder, onPage, onSort } = useDataTable();
 
@@ -82,6 +87,7 @@ const columns: ColumnConfig[] = [
 
 // Create / Edit
 function openCreateDialog() {
+  clearErrors();
   editingHall.value = null;
 
   hallName.value = "";
@@ -90,6 +96,7 @@ function openCreateDialog() {
 }
 
 function openEditDialog(hall: Hall) {
+  clearErrors();
   editingHall.value = hall;
 
   hallName.value = hall.name;
@@ -98,21 +105,31 @@ function openEditDialog(hall: Hall) {
 }
 
 async function saveHall() {
-  if (editingHall.value) {
-    await updateHallMutation.mutateAsync({
-      id: editingHall.value.id,
+  clearErrors();
 
-      payload: {
+  try {
+    if (editingHall.value) {
+      await updateHallMutation.mutateAsync({
+        id: editingHall.value.id,
+
+        payload: {
+          name: hallName.value,
+        },
+      });
+    } else {
+      await createHallMutation.mutateAsync({
         name: hallName.value,
-      },
-    });
-  } else {
-    await createHallMutation.mutateAsync({
-      name: hallName.value,
-    });
-  }
+      });
+    }
 
-  isDialogVisible.value = false;
+    isDialogVisible.value = false;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      setBackendErrors(error);
+    } else {
+      generalError.value = "Unexpected error occurred.";
+    }
+  }
 }
 
 async function onDeleteHall(id: number) {
@@ -169,21 +186,16 @@ async function onDeleteHall(id: number) {
       </template>
     </BaseDataTable>
   </div>
-  <Dialog v-model:visible="isDialogVisible" modal :header="editingHall ? 'Edit Hall' : 'Create Hall'" class="w-sm">
-    <div class="flex flex-col gap-4">
+  <BaseDialog
+    v-model:visible="isDialogVisible"
+    :title="editingHall ? 'Edit Hall' : 'Create Hall'"
+    :submit-label="editingHall ? 'Save' : 'Create'"
+    :loading="createHallMutation.isPending.value || updateHallMutation.isPending.value"
+    @submit="saveHall"
+  >
+    <BaseFormField :error="fieldErrors.name">
       <InputText v-model="hallName" placeholder="Hall name" />
-
-      <div class="flex justify-end gap-2">
-        <Button label="Cancel" severity="secondary" @click="isDialogVisible = false" />
-
-        <Button
-          :label="editingHall ? 'Save' : 'Create'"
-          :severity="editingHall ? 'info' : 'success'"
-          :loading="createHallMutation.isPending.value || updateHallMutation.isPending.value"
-          @click="saveHall"
-        />
-      </div>
-    </div>
-  </Dialog>
+    </BaseFormField>
+  </BaseDialog>
   <ConfirmDialog />
 </template>
