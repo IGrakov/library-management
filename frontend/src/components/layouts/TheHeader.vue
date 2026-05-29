@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Breadcrumb from "primevue/breadcrumb";
 import Button from "primevue/button";
 import Menubar from "primevue/menubar";
 import type { MenuItem } from "primevue/menuitem";
@@ -15,6 +16,15 @@ const authStore = useAuthStore();
 const isAuthenticated = computed(() => !!authStore.token);
 
 const userRole = computed(() => authStore.user?.role);
+
+const home = computed<MenuItem>(() => ({
+  icon: "pi pi-home",
+  command: () => router.push("/"),
+}));
+
+const breadcrumbs = computed<MenuItem[]>(() => {
+  return (route.meta.breadcrumb as MenuItem[]) ?? [];
+});
 
 const menuItems = computed<MenuItem[]>(() => {
   if (!isAuthenticated.value) {
@@ -112,5 +122,6 @@ function logout() {
         </div>
       </template>
     </Menubar>
+    <Breadcrumb :home="home" :model="breadcrumbs" />
   </div>
 </template>

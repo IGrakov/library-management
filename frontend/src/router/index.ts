@@ -16,12 +16,16 @@ const router = createRouter({
       path: "/login",
       name: "login",
       component: LoginPage,
+      meta: {
+        breadcrumb: [{ label: "Register" }],
+      },
     },
     {
       path: "/register",
       name: "register",
       component: RegisterPage,
       meta: {
+        breadcrumb: [{ label: "Register" }],
         requiresAuth: true,
       },
     },
@@ -30,6 +34,7 @@ const router = createRouter({
       name: "users",
       component: UserListPage,
       meta: {
+        breadcrumb: [{ label: "Users" }],
         requiresAuth: true,
       },
     },
@@ -38,6 +43,7 @@ const router = createRouter({
       name: "books",
       component: BookListPage,
       meta: {
+        breadcrumb: [{ label: "Books" }],
         requiresAuth: true,
       },
     },
@@ -46,6 +52,7 @@ const router = createRouter({
       name: "halls",
       component: HallListPage,
       meta: {
+        breadcrumb: [{ label: "Reference Values" }, { label: "Halls" }],
         requiresAuth: true,
       },
     },
@@ -54,6 +61,7 @@ const router = createRouter({
       name: "genres",
       component: GenreListPage,
       meta: {
+        breadcrumb: [{ label: "Reference Values" }, { label: "Genres" }],
         requiresAuth: true,
       },
     },
@@ -62,6 +70,7 @@ const router = createRouter({
       name: "languages",
       component: LanguageListPage,
       meta: {
+        breadcrumb: [{ label: "Reference Values" }, { label: "Languages" }],
         requiresAuth: true,
       },
     },
