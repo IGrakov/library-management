@@ -9,25 +9,25 @@ import { computed, ref } from "vue";
 import BaseDataTable from "@/components/common/BaseDataTable.vue";
 import { useDataTable } from "@/composables/useDataTable";
 import { useDebouncedFilters } from "@/composables/useDebouncedFilters";
-import { useCreateHall, useDeleteHall, useUpdateHall } from "@/queries/halls.mutations";
-import { useHallsQuery } from "@/queries/halls.queries";
-import { Hall } from "@/types/halls";
+import { useCreateGenre, useDeleteGenre, useUpdateGenre } from "@/queries/genres.mutations";
+import { useGenresQuery } from "@/queries/genres.queries";
+import { Genre } from "@/types/genres";
 import { ColumnConfig } from "@/types/table";
 
 const { page, rowsPerPage, sortField, sortOrder, onPage, onSort } = useDataTable();
 
-const createHallMutation = useCreateHall();
-const updateHallMutation = useUpdateHall();
-const deleteHallMutation = useDeleteHall();
+const createGenreMutation = useCreateGenre();
+const updateGenreMutation = useUpdateGenre();
+const deleteGenreMutation = useDeleteGenre();
 
 const confirm = useConfirm();
 
 // Dialog state
 const isDialogVisible = ref(false);
 
-const editingHall = ref<Hall | null>(null);
+const editingGenre = ref<Genre | null>(null);
 
-const hallName = ref("");
+const genreName = ref("");
 
 // Filters
 const nameFilter = ref("");
@@ -59,12 +59,12 @@ const queryParams = computed(() => ({
 }));
 
 // Query
-const hallsQuery = useHallsQuery(queryParams);
+const genresQuery = useGenresQuery(queryParams);
 
 // Flatten nested fields
-const halls = computed(() =>
-  (hallsQuery.data.value?.results ?? []).map((hall) => ({
-    ...hall,
+const genres = computed(() =>
+  (genresQuery.data.value?.results ?? []).map((genre) => ({
+    ...genre,
   })),
 );
 
@@ -82,42 +82,42 @@ const columns: ColumnConfig[] = [
 
 // Create / Edit
 function openCreateDialog() {
-  editingHall.value = null;
+  editingGenre.value = null;
 
-  hallName.value = "";
-
-  isDialogVisible.value = true;
-}
-
-function openEditDialog(hall: Hall) {
-  editingHall.value = hall;
-
-  hallName.value = hall.name;
+  genreName.value = "";
 
   isDialogVisible.value = true;
 }
 
-async function saveHall() {
-  if (editingHall.value) {
-    await updateHallMutation.mutateAsync({
-      id: editingHall.value.id,
+function openEditDialog(genre: Genre) {
+  editingGenre.value = genre;
+
+  genreName.value = genre.name;
+
+  isDialogVisible.value = true;
+}
+
+async function saveGenre() {
+  if (editingGenre.value) {
+    await updateGenreMutation.mutateAsync({
+      id: editingGenre.value.id,
 
       payload: {
-        name: hallName.value,
+        name: genreName.value,
       },
     });
   } else {
-    await createHallMutation.mutateAsync({
-      name: hallName.value,
+    await createGenreMutation.mutateAsync({
+      name: genreName.value,
     });
   }
 
   isDialogVisible.value = false;
 }
 
-async function onDeleteHall(id: number) {
+async function onDeleteGenre(id: number) {
   confirm.require({
-    message: "Are you sure you want to delete this hall?",
+    message: "Are you sure you want to delete this genre?",
 
     header: "Delete Confirmation",
 
@@ -135,7 +135,7 @@ async function onDeleteHall(id: number) {
     },
 
     accept: async () => {
-      await deleteHallMutation.mutateAsync(id);
+      await deleteGenreMutation.mutateAsync(id);
     },
   });
 }
@@ -145,15 +145,15 @@ async function onDeleteHall(id: number) {
   <div class="card p-4">
     <!-- Filters -->
     <div class="flex justify-center gap-4 mb-4">
-      <InputText v-model="nameFilter" placeholder="Filter by hall name" class="border rounded p-1" />
+      <InputText v-model="nameFilter" placeholder="Filter by genre name" class="border rounded p-1" />
       <Button icon="pi pi-plus" severity="success" @click="openCreateDialog" />
     </div>
 
     <BaseDataTable
-      :rows="halls"
+      :rows="genres"
       :columns="columns"
-      :loading="hallsQuery.isFetching.value"
-      :total-records="hallsQuery.data.value?.count"
+      :loading="genresQuery.isFetching.value"
+      :total-records="genresQuery.data.value?.count"
       :rows-per-page="rowsPerPage"
       :sort-field="sortField"
       :sort-order="sortOrder"
@@ -164,23 +164,23 @@ async function onDeleteHall(id: number) {
         <div class="flex gap-2 justify-center">
           <Button icon="pi pi-pencil" severity="info" text rounded @click="openEditDialog(data)" />
 
-          <Button icon="pi pi-trash" severity="danger" text rounded @click="onDeleteHall(data.id)" />
+          <Button icon="pi pi-trash" severity="danger" text rounded @click="onDeleteGenre(data.id)" />
         </div>
       </template>
     </BaseDataTable>
   </div>
-  <Dialog v-model:visible="isDialogVisible" modal :header="editingHall ? 'Edit Hall' : 'Create Hall'" class="w-sm">
+  <Dialog v-model:visible="isDialogVisible" modal :header="editingGenre ? 'Edit Genre' : 'Create Genre'" class="w-sm">
     <div class="flex flex-col gap-4">
-      <InputText v-model="hallName" placeholder="Hall name" />
+      <InputText v-model="genreName" placeholder="Genre name" />
 
       <div class="flex justify-end gap-2">
         <Button label="Cancel" severity="secondary" @click="isDialogVisible = false" />
 
         <Button
-          :label="editingHall ? 'Save' : 'Create'"
-          :severity="editingHall ? 'info' : 'success'"
-          :loading="createHallMutation.isPending.value || updateHallMutation.isPending.value"
-          @click="saveHall"
+          :label="editingGenre ? 'Save' : 'Create'"
+          :severity="editingGenre ? 'info' : 'success'"
+          :loading="createGenreMutation.isPending.value || updateGenreMutation.isPending.value"
+          @click="saveGenre"
         />
       </div>
     </div>

@@ -2,7 +2,9 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import DefaultLayout from "@/components/layouts/DefaultLayout.vue";
 import BookListPage from "@/components/pages/BookListPage.vue";
-import hallListPage from "@/components/pages/HallListPage.vue";
+import GenreListPage from "@/components/pages/GenreListPage.vue";
+import HallListPage from "@/components/pages/HallListPage.vue";
+import LanguageListPage from "@/components/pages/LanguageListPage.vue";
 import LoginPage from "@/components/pages/LoginPage.vue";
 import RegisterPage from "@/components/pages/RegisterPage.vue";
 import UserListPage from "@/components/pages/UserListPage.vue";
@@ -19,6 +21,9 @@ const router = createRouter({
       path: "/register",
       name: "register",
       component: RegisterPage,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: "/users",
@@ -39,7 +44,23 @@ const router = createRouter({
     {
       path: "/halls",
       name: "halls",
-      component: hallListPage,
+      component: HallListPage,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/genres",
+      name: "genres",
+      component: GenreListPage,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/languages",
+      name: "languages",
+      component: LanguageListPage,
       meta: {
         requiresAuth: true,
       },

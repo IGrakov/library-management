@@ -10,7 +10,7 @@ import { ColumnConfig } from "@/types/table";
 
 const { page, rowsPerPage, sortField, sortOrder, onPage, onSort } = useDataTable();
 
-// --- Filter state
+// Filters
 const nameFilter = ref("");
 const emailFilter = ref("");
 const roleFilter = ref("");
@@ -28,7 +28,7 @@ const { cleanedFilters } = useDebouncedFilters(
   },
 );
 
-// --- Map DataTable columns to API fields
+// Sort
 const apiFieldMap: Record<string, string> = {
   email: "email",
   nameStr: "full_name",
@@ -44,8 +44,10 @@ const queryParams = computed(() => ({
   ordering: sortField.value ? `${sortOrder.value === "desc" ? "-" : ""}${sortField.value}` : undefined,
 }));
 
+// Query
 const usersQuery = useUsersQuery(queryParams);
 
+// Flatten nested fields
 const users = computed(() =>
   (usersQuery.data.value?.results ?? []).map((user) => ({
     ...user,

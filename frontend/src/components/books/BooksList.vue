@@ -10,7 +10,7 @@ import { ColumnConfig } from "@/types/table";
 
 const { page, rowsPerPage, sortField, sortOrder, onPage, onSort } = useDataTable();
 
-// --- Filter state
+// Filters
 const titleFilter = ref("");
 const authorFilter = ref("");
 const languageFilter = ref("");
@@ -32,7 +32,7 @@ const { cleanedFilters } = useDebouncedFilters(
   },
 );
 
-// --- Map DataTable columns to API fields
+// Sort
 const apiFieldMap: Record<string, string> = {
   title: "title",
   authorStr: "author",
@@ -53,6 +53,7 @@ const queryParams = computed(() => ({
   ordering: sortField.value ? `${sortOrder.value === "desc" ? "-" : ""}${sortField.value}` : undefined,
 }));
 
+// Query
 const booksQuery = useBooksQuery(queryParams);
 
 // Flatten nested fields
