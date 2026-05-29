@@ -3,47 +3,14 @@ Library Management System
 Backend - Django + DRF  
 Frontend - Vue3 + Vite + TailwindCSS + PrimeVue
 
-## To build the entire project
-if you want to rebuild the image from scratch
+## To build and launch the entire project
 ```
-docker compose -f docker-compose.dev.yml build --no-cache
-```
-or if you want to keep the cached layers
-```
-docker compose -f docker-compose.dev.yml build
+make up-build
 ```
 
-## To build frontend only
-if you want to rebuild the frontend image from scratch
-```
-docker compose -f docker-compose.dev.yml build frontend --no-cache
-```
-or if you want to keep the cached layers
-```
-docker compose -f docker-compose.dev.yml build frontend
-```
+Many other useful commands are available in the Makefile
 
-## To build backend only
-if you want to rebuild the backend image from scratch
-```
-docker compose -f docker-compose.dev.yml build backend --no-cache
-```
-or if you want to keep the cached layers
-```
-docker compose -f docker-compose.dev.yml build backend
-```
-
-## To start the project
-```
-docker compose -f docker-compose.dev.yml up
-```
-
-## To remove containers
-```
-docker compose -f docker-compose.dev.yml down
-```
-
-## To run any manage.py commands, e.g.  python manage.py createsuperuser
-```
-docker compose -f docker-compose.dev.yml exec backend poetry run python manage.py createsuperuser
-```
+After launching the project,
+Backend will be available at http://localhost:8001/
+Frontend will be available at http://localhost:5173/
+or at another domain you set in the .env file
