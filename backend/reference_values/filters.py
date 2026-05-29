@@ -1,7 +1,7 @@
-from django.db.models import QuerySet, Q
+from django.db.models import Q, QuerySet
 from django_filters import rest_framework as filters
 
-from reference_values.models import Hall, Genre, Language
+from reference_values.models import Genre, Hall, Language
 
 
 class HallFilter(filters.FilterSet):
@@ -9,18 +9,16 @@ class HallFilter(filters.FilterSet):
 
     class Meta:
         model = Hall
-        fields = (
-            "name",
-        )
+        fields = ("name",)
+
 
 class GenreFilter(filters.FilterSet):
     name = filters.CharFilter(field_name="name", lookup_expr="icontains")
 
     class Meta:
         model = Genre
-        fields = (
-            "name",
-        )
+        fields = ("name",)
+
 
 class LanguageFilter(filters.FilterSet):
     name = filters.CharFilter(field_name="name", lookup_expr="icontains")

@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework.filters import OrderingFilter
 
 from core.pagination import ResultSetPagination
-from reference_values.filters import HallFilter, GenreFilter, LanguageFilter
+from reference_values.filters import GenreFilter, HallFilter, LanguageFilter
 from reference_values.models import Genre, Hall, Language
 from reference_values.serializers import (
     GenreSerializer,
