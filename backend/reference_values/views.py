@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework.filters import OrderingFilter
 
 from core.pagination import ResultSetPagination
-from reference_values.filters import HallFilter
+from reference_values.filters import HallFilter, GenreFilter, LanguageFilter
 from reference_values.models import Genre, Hall, Language
 from reference_values.serializers import (
     GenreSerializer,
@@ -57,8 +57,22 @@ class ListLanguageView(generics.ListAPIView):
     """List languages"""
 
     serializer_class = LanguageSerializer
-    queryset = Language.objects.all()
+    queryset = Language.objects.all().order_by("name")
     pagination_class = ResultSetPagination
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+    filterset_class = LanguageFilter
+
+    ordering_fields = (
+        "id",
+        "name",
+        "two_letter_code",
+        "three_letter_code",
+    )
+
+    order = "name"
 
 
 @extend_schema(
@@ -104,8 +118,20 @@ class ListGenreView(generics.ListAPIView):
     """List genres"""
 
     serializer_class = GenreSerializer
-    queryset = Genre.objects.all()
+    queryset = Genre.objects.all().order_by("name")
     pagination_class = ResultSetPagination
+    filter_backends = (
+        DjangoFilterBackend,
+        OrderingFilter,
+    )
+    filterset_class = GenreFilter
+
+    ordering_fields = (
+        "id",
+        "name",
+    )
+
+    order = "name"
 
 
 @extend_schema(
@@ -151,7 +177,7 @@ class ListHallView(generics.ListAPIView):
     """List halls"""
 
     serializer_class = HallSerializer
-    queryset = Hall.objects.all()
+    queryset = Hall.objects.all().order_by("name")
     pagination_class = ResultSetPagination
     filter_backends = (
         DjangoFilterBackend,
@@ -164,4 +190,4 @@ class ListHallView(generics.ListAPIView):
         "name",
     )
 
-    order = "id"
+    order = "name"

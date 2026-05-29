@@ -7,9 +7,9 @@ class Language(TimeStampMixin):
     """Model for reference value of language consisting of ISO639
     language name and two- and three-letter code"""
 
-    name = models.CharField(max_length=255)
-    two_letter_code = models.CharField(max_length=2)
-    three_letter_code = models.CharField(max_length=3)
+    name = models.CharField(max_length=255, unique=True)
+    two_letter_code = models.CharField(max_length=2, unique=True)
+    three_letter_code = models.CharField(max_length=3, unique=True)
 
     def __str__(self) -> str:
         return self.name
@@ -21,7 +21,7 @@ class Language(TimeStampMixin):
 class Genre(TimeStampMixin):
     """Model for reference value of book genre"""
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def __str__(self) -> str:
         return self.name
@@ -33,7 +33,7 @@ class Genre(TimeStampMixin):
 class Hall(TimeStampMixin):
     """Model for a library hall"""
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def __str__(self) -> str:
         return self.name

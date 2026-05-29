@@ -11,7 +11,7 @@ from reference_values.models import Genre, Hall, Language
 class Author(TimeStampMixin):
     """Model for an author"""
 
-    last_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100, db_index=True)
     first_name = models.CharField(max_length=100, null=True, blank=True)  # noqa: DJ001
     middle_name = models.CharField(max_length=100, null=True, blank=True)  # noqa: DJ001
 
@@ -27,7 +27,7 @@ class Book(TimeStampMixin):
 
     title = models.CharField(max_length=255, null=False, blank=False, db_index=True)
     author = models.ManyToManyField(Author, blank=True, related_name="books")
-    published_date = models.DateField(null=True, blank=True)
+    published_date = models.DateField(null=True, blank=True, db_index=True)
     isbn = models.CharField(max_length=17, null=False, blank=False, unique=True)
     pages = models.IntegerField(null=True, blank=True)
     cover = models.URLField(null=True, blank=True)  # noqa: DJ001
@@ -79,7 +79,7 @@ class BookLoan(TimeStampMixin):
     reader_card = models.ForeignKey(ReaderCard, on_delete=models.CASCADE, related_name="book_loans")
 
     borrowed_at = models.DateTimeField(auto_now_add=True)
-    due_date = models.DateTimeField()
+    due_date = models.DateTimeField(db_index=True)
     returned_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
