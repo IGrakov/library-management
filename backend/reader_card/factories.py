@@ -17,7 +17,7 @@ class ReaderCardFactory(factory.django.DjangoModelFactory):
     photo = factory.django.ImageField()
 
     @factory.post_generation
-    def hall_access(self, create: bool, extracted: Iterable[Hall], **kwargs: Any):  # noqa: ARG002, ANN401
+    def hall_access(self, create: bool, extracted: Iterable[Hall], **kwargs: Any) -> None:  # noqa: ARG002, ANN401
         if not create:
             return
 

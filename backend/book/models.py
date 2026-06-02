@@ -5,21 +5,7 @@ from django.db.models import Q, UniqueConstraint
 
 from core.models import TimeStampMixin
 from reader_card.models import ReaderCard
-from reference_values.models import Genre, Hall, Language
-
-
-class Author(TimeStampMixin):
-    """Model for an author"""
-
-    last_name = models.CharField(max_length=100, db_index=True)
-    first_name = models.CharField(max_length=100, null=True, blank=True)  # noqa: DJ001
-    middle_name = models.CharField(max_length=100, null=True, blank=True)  # noqa: DJ001
-
-    def __str__(self) -> str:
-        return ", ".join(filter(None, [self.last_name, " ".join(filter(None, [self.first_name, self.middle_name]))]))
-
-    class Meta:
-        verbose_name = "Author"
+from reference_values.models import Author, Genre, Hall, Language
 
 
 class Book(TimeStampMixin):

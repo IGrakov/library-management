@@ -14,4 +14,7 @@ urlpatterns = [
     path("add-hall/", views.CreateHallView.as_view(), name="add_hall"),
     path("manage-hall/<int:pk>/", views.RetrieveUpdateDeleteHallView.as_view(), name="manage_hall"),
     path("list-hall/", views.ListHallView.as_view(), name="list_hall"),
+    path("add-author/", views.CreateAuthorView.as_view(), name="create_author"),
+    path("manage-author/<int:pk>/", views.RetrieveUpdateDeleteAuthorView.as_view(), name="manage_author"),
+    path("list-author/", views.ListAuthorView.as_view(), name="list_author"),
 ]

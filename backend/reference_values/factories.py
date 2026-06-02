@@ -3,7 +3,7 @@ import random
 import factory
 
 from reference_values.constants import HallTypes
-from reference_values.models import Genre, Hall, Language
+from reference_values.models import Author, Genre, Hall, Language
 
 
 class LanguageFactory(factory.django.DjangoModelFactory):
@@ -27,3 +27,12 @@ class HallFactory(factory.django.DjangoModelFactory):
         model = Hall
 
     name = factory.LazyFunction(lambda: random.choice([el for el in HallTypes]))  # noqa C416
+
+
+class AuthorFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Author
+
+    last_name = factory.Faker("last_name")
+    first_name = factory.Faker("first_name")
+    middle_name = factory.Faker("first_name")

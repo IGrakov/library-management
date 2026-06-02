@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from reference_values.models import Genre, Hall, Language
+from reference_values.models import Author, Genre, Hall, Language
 
 
 class LanguageSerializer(serializers.ModelSerializer):
@@ -32,4 +32,16 @@ class HallSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
+        )
+
+
+class AuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
+
+        fields = (
+            "id",
+            "last_name",
+            "first_name",
+            "middle_name",
         )

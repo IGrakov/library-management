@@ -57,9 +57,9 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
         return f"{self.first_name} {self.last_name}, {self.email}"
 
     class Meta:
-        indexes = [
+        indexes = (
             models.Index(
                 fields=["last_name", "first_name"],
                 name="user_last_first_name_idx",
             ),
-        ]
+        )

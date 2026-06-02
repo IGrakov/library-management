@@ -3,21 +3,9 @@ from typing import Any
 from django.db.transaction import atomic
 from rest_framework import serializers
 
-from book.models import Author, Book, BookCopy
-from reference_values.models import Genre, Language
-from reference_values.serializers import GenreSerializer, LanguageSerializer
-
-
-class AuthorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Author
-
-        fields = (
-            "id",
-            "last_name",
-            "first_name",
-            "middle_name",
-        )
+from book.models import Book, BookCopy
+from reference_values.models import Author, Genre, Language
+from reference_values.serializers import AuthorSerializer, GenreSerializer, LanguageSerializer
 
 
 class BookSerializer(serializers.ModelSerializer):

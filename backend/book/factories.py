@@ -3,18 +3,9 @@ from typing import Any, Iterable
 
 import factory
 
-from book.models import Author, Book, BookCopy
-from reference_values.factories import GenreFactory, LanguageFactory
-from reference_values.models import Genre, Language
-
-
-class AuthorFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Author
-
-    last_name = factory.Faker("last_name")
-    first_name = factory.Faker("first_name")
-    middle_name = factory.Faker("first_name")
+from book.models import Book, BookCopy
+from reference_values.factories import AuthorFactory, GenreFactory, LanguageFactory
+from reference_values.models import Author, Genre, Language
 
 
 class BookFactory(factory.django.DjangoModelFactory):

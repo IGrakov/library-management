@@ -1,22 +1,24 @@
 import random
 from typing import Any
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
+from django.db import transaction
 from faker import Faker
 
-from book.models import Author, Book, BookCopy
+from book.models import Book, BookCopy
 from reader_card.models import ReaderCard
 from reference_values.constants import HallTypes
-from reference_values.models import Genre, Hall, Language
-from user import constants
+from reference_values.models import Author, Genre, Hall, Language
 from user.constants import Roles
+from user.factories import UserFactory
+from user.models import User
 
-NUM_OF_LIBRARIANS = 2
-NUM_OF_READERS = 20
-NUM_OF_AUTHORS = 20
-NUM_OF_BOOKS = 100
+NUM_OF_ADMINS = 10
+NUM_OF_LIBRARIANS = 10
+NUM_OF_READERS = 2_000
+NUM_OF_AUTHORS = 5_000
+NUM_OF_BOOKS = 100_000
 MIDDLE_NAME_PROBABILITY = 0.2
 
 fake = Faker()
@@ -25,31 +27,49 @@ fake = Faker()
 class Command(BaseCommand):
     help = "Populates database with random generated data"
 
+    def add_arguments(self, parser) -> None:  # noqa: ANN001
+        parser.add_argument("--readers", type=int, default=NUM_OF_READERS)
+        parser.add_argument("--authors", type=int, default=NUM_OF_AUTHORS)
+        parser.add_argument("--books", type=int, default=NUM_OF_BOOKS)
+
+        parser.add_argument(
+            "--flush",
+            action="store_true",
+            help="Delete existing data before seeding",
+        )
+
+    @transaction.atomic
     def handle(self, *args: Any, **options: Any) -> None:  # noqa: ARG002, ANN401
+        if options["flush"]:
+            self.stdout.write("Flushing database...")
+            User.objects.filter(is_superuser=False).delete()
+            BookCopy.objects.all().delete()
+            Book.objects.all().delete()
+            Author.objects.all().delete()
 
         # # populate database with user groups
-        default_group, _ = Group.objects.get_or_create(name=constants.Roles.READER)
-        librarian_group, _ = Group.objects.get_or_create(name=constants.Roles.LIBRARIAN)
+        Group.objects.get_or_create(name=Roles.READER)
+        Group.objects.get_or_create(name=Roles.LIBRARIAN)
 
-        # populate database with users
-        user = get_user_model()
+        # # populate database with users
+        def create_users(count: int, role: str = Roles.READER) -> None:
+            start_id = User.objects.last().id + 1 if User.objects.exists() else 0
+            for i in range(count):
+                first_name = fake.first_name()
+                last_name = fake.last_name()
 
-        for i in range(NUM_OF_LIBRARIANS + NUM_OF_READERS):
-            last_name = fake.last_name()
-            first_name = fake.first_name()
+                UserFactory(
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=f"{first_name}.{last_name}{start_id + i}@google.com",
+                    role=role,
+                )
 
-            usr, created = user.objects.get_or_create(
-                last_name=last_name,
-                first_name=first_name,
-                email=fake.email(),
-                password="password",  # noqa: S106
-            )
+        create_users(NUM_OF_ADMINS, Roles.ADMIN)
+        create_users(NUM_OF_LIBRARIANS, Roles.LIBRARIAN)
+        create_users(NUM_OF_READERS)
 
-            if created:
-                if i < NUM_OF_LIBRARIANS:
-                    librarian_group.user_set.add(usr)
-                else:
-                    default_group.user_set.add(usr)
+        self.stdout.write(self.style.SUCCESS("Successfully created users"))
 
         # populate database with languages
         languages = [
@@ -80,6 +100,8 @@ class Command(BaseCommand):
                 three_letter_code=language["three_letter_code"],
             )
 
+        self.stdout.write(self.style.SUCCESS("Successfully created languages"))
+
         # populate database with genres
         genres = [
             "Fantasy",
@@ -103,13 +125,17 @@ class Command(BaseCommand):
         for genre in genres:
             Genre.objects.get_or_create(name=genre)
 
+        self.stdout.write(self.style.SUCCESS("Successfully created genres"))
+
         # populate database with halls
         for hall in HallTypes:
             Hall.objects.get_or_create(name=hall)
 
+        self.stdout.write(self.style.SUCCESS("Successfully created halls"))
+
         # populate database with reader cards
         hall_choices = [1, 1, 2, 2, 2, 3, 4, 5]
-        for reader in user.objects.all():
+        for reader in User.objects.all():
             if reader.groups.filter(name=Roles.READER).exists() and not ReaderCard.objects.filter(reader=reader):
                 reader_card, created = ReaderCard.objects.get_or_create(reader=reader, photo=fake.file_path())
 
@@ -118,6 +144,8 @@ class Command(BaseCommand):
                     for _ in range(num_of_halls):
                         hall = Hall.objects.order_by("?").first()
                         reader_card.hall_access.add(hall)
+
+        self.stdout.write(self.style.SUCCESS("Successfully created reader cards"))
 
         # populate database with authors
         for _ in range(NUM_OF_AUTHORS):
@@ -130,15 +158,25 @@ class Command(BaseCommand):
 
             Author.objects.get_or_create(last_name=last_name, first_name=first_name, middle_name=middle_name)
 
+        self.stdout.write(self.style.SUCCESS("Successfully created authors"))
+
         # populate database with books
+        existing_isbns = set(Book.objects.all().values_list("isbn", flat=True))
+        new_isbns = set()
+        for _ in range(NUM_OF_BOOKS):
+            isbn = fake.isbn13()
+            if isbn not in existing_isbns:
+                new_isbns.add(isbn)
+
+        self.stdout.write(self.style.SUCCESS("Successfully created unique ISBNs"))
+
         author_choices = [1, 1, 1, 1, 2, 2, 3]  # to ensure unequal distribution of choices
         language_choices = [1, 1, 1, 1, 1, 2, 3]
         genre_choices = [1, 1, 1, 1, 1, 1, 2]
-        for _ in range(NUM_OF_BOOKS):
+        for isbn in new_isbns:
             title_length = random.randint(1, 5)  # noqa: S311
             title = fake.sentence(nb_words=title_length)[:-1]
             published_date = fake.date()
-            isbn = fake.isbn13()
             pages = random.randint(10, 1_000)  # noqa: S311
             cover = fake.image_url()
             book, created = Book.objects.get_or_create(
@@ -168,6 +206,8 @@ class Command(BaseCommand):
 
                 book.save()
 
+        self.stdout.write(self.style.SUCCESS("Successfully created books"))
+
         # populate database with book copies
         books = Book.objects.all()
 
@@ -179,5 +219,7 @@ class Command(BaseCommand):
             for _ in range(num_of_copies):
                 book_copies.append(BookCopy(book=book, uid=fake.uuid4()))
             BookCopy.objects.bulk_create(book_copies)
+
+        self.stdout.write(self.style.SUCCESS("Successfully created book copies"))
 
         self.stdout.write(self.style.SUCCESS("Successfully populated the database"))

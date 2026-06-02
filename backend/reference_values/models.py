@@ -40,3 +40,17 @@ class Hall(TimeStampMixin):
 
     class Meta:
         verbose_name = "Hall"
+
+
+class Author(TimeStampMixin):
+    """Model for an author"""
+
+    last_name = models.CharField(max_length=100, db_index=True)
+    first_name = models.CharField(max_length=100, null=True, blank=True)  # noqa: DJ001
+    middle_name = models.CharField(max_length=100, null=True, blank=True)  # noqa: DJ001
+
+    def __str__(self) -> str:
+        return ", ".join(filter(None, [self.last_name, " ".join(filter(None, [self.first_name, self.middle_name]))]))
+
+    class Meta:
+        verbose_name = "Author"

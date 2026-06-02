@@ -7,62 +7,14 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny
 
 from book.filters import BookFilter
-from book.models import Author, Book, BookCopy
+from book.models import Book, BookCopy
 from book.serializers import (
-    AuthorSerializer,
     BookCopySerializer,
     BookSerializer,
     BookWriteSerializer,
 )
 from core.pagination import ResultSetPagination
 from user.permissions import IsAdminOrReadOnly
-
-
-@extend_schema(
-    tags=["author"],
-)
-class CreateAuthorView(generics.CreateAPIView):
-    """Create new author"""
-
-    permission_classes = (IsAdminOrReadOnly,)
-    serializer_class = AuthorSerializer
-    queryset = Author.objects.all()
-
-
-@extend_schema_view(
-    get=extend_schema(
-        description="Retrieve author by id",
-    ),
-    put=extend_schema(
-        description="Update author by id",
-    ),
-    patch=extend_schema(
-        description="Partially update author by id",
-    ),
-    delete=extend_schema(
-        description="Delete author by id",
-    ),
-)
-@extend_schema(
-    tags=["author"],
-)
-class RetrieveUpdateDeleteAuthorView(generics.RetrieveUpdateDestroyAPIView):
-    """Retrieve, update or delete author by id"""
-
-    permission_classes = (IsAdminOrReadOnly,)
-    serializer_class = AuthorSerializer
-    queryset = Author.objects.all()
-
-
-@extend_schema(
-    tags=["author"],
-)
-class ListAuthorView(generics.ListAPIView):
-    """List authors"""
-
-    serializer_class = AuthorSerializer
-    queryset = Author.objects.all()
-    pagination_class = ResultSetPagination
 
 
 @extend_schema_view(

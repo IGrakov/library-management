@@ -1,15 +1,6 @@
 from django.contrib import admin
 
-from book.models import Author, Book, BookCopy
-
-
-@admin.register(Author)
-class AuthorAdmin(admin.ModelAdmin):
-    list_display = ("last_name", "first_name", "middle_name")
-    search_fields = ("last_name",)
-    ordering = ("last_name",)
-
-    list_per_page = 20
+from book.models import Book, BookCopy
 
 
 @admin.register(Book)
