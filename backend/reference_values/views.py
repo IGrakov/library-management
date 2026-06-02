@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework.filters import OrderingFilter
 
 from core.pagination import ResultSetPagination
-from reference_values.filters import GenreFilter, HallFilter, LanguageFilter
+from reference_values.filters import GenreFilter, HallFilter, LanguageFilter, AuthorFilter
 from reference_values.models import Author, Genre, Hall, Language
 from reference_values.serializers import (
     AuthorSerializer,
@@ -243,3 +243,12 @@ class ListAuthorView(generics.ListAPIView):
         DjangoFilterBackend,
         OrderingFilter,
     )
+
+    filterset_class = AuthorFilter
+
+    ordering_fields = (
+        "id",
+        "last_name",
+    )
+
+    order = "last_name"

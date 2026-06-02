@@ -48,7 +48,5 @@ class AuthorFilter(filters.FilterSet):
     @staticmethod
     def filter_name(queryset: QuerySet[Author], code: str, value: str) -> QuerySet[Author]:  # noqa: ARG004
         return queryset.filter(
-            Q(author__first_name__icontains=value)
-            | Q(author__middle_name__icontains=value)
-            | Q(author__last_name__icontains=value),
+            Q(last_name__icontains=value) | Q(middle_name__icontains=value) | Q(first_name__icontains=value),
         ).distinct()

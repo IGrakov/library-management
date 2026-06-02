@@ -3,7 +3,6 @@ from typing import Any
 
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
-from django.db import transaction
 from faker import Faker
 
 from book.models import Book, BookCopy
@@ -38,8 +37,9 @@ class Command(BaseCommand):
             help="Delete existing data before seeding",
         )
 
-    @transaction.atomic
     def handle(self, *args: Any, **options: Any) -> None:  # noqa: ARG002, ANN401
+        self.stdout.write(self.style.SUCCESS("Starting to populate the database..."))
+
         if options["flush"]:
             self.stdout.write("Flushing database...")
             User.objects.filter(is_superuser=False).delete()
@@ -48,8 +48,9 @@ class Command(BaseCommand):
             Author.objects.all().delete()
 
         # # populate database with user groups
-        Group.objects.get_or_create(name=Roles.READER)
+        Group.objects.get_or_create(name=Roles.ADMIN)
         Group.objects.get_or_create(name=Roles.LIBRARIAN)
+        Group.objects.get_or_create(name=Roles.READER)
 
         # # populate database with users
         def create_users(count: int, role: str = Roles.READER) -> None:
