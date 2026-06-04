@@ -11,7 +11,15 @@ export const useAuthStore = defineStore("auth", () => {
 
   const isAuthenticated = computed(() => !!token.value);
 
-  const role = computed(() => user.value?.role);
+  const role = computed(() => user.value?.role?.toLowerCase());
+
+  const isAdmin = computed(() => user.value?.role?.toLowerCase() === "admin");
+
+  const isLibrarian = computed(() => user.value?.role?.toLowerCase() === "librarian");
+
+  const canEditBook = computed(() => isAdmin.value || isLibrarian.value);
+
+  const canCreateOrDeleteBook = computed(() => isAdmin.value);
 
   async function login(email: string, password: string) {
     const response = await authApi.login({
@@ -40,6 +48,10 @@ export const useAuthStore = defineStore("auth", () => {
     user,
     role,
     isAuthenticated,
+    isAdmin,
+    isLibrarian,
+    canEditBook,
+    canCreateOrDeleteBook,
 
     login,
     logout,

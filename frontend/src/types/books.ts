@@ -1,6 +1,21 @@
-export interface Book extends CreateBookPayload {
+export interface BaseBook {
+  title: string;
+  author: { first_name: string; middle_name: string | null; last_name: string }[];
+  language: { name: string }[];
+  genre: { name: string }[];
+  published_date: string | null;
+  pages: number | null;
+  isbn: string;
+}
+
+export interface Book extends BaseBook {
   id: number;
   copies_count: number;
+}
+
+export interface DetailedBook extends BaseBook {
+  id: number;
+  cover: string | null;
 }
 
 export interface PaginatedBooks {
@@ -12,11 +27,13 @@ export interface PaginatedBooks {
 
 export interface CreateBookPayload {
   title: string;
-  author: { first_name: string; last_name: string }[];
-  language: { name: string }[];
-  genre: { name: string }[];
-  published_date: string;
-  pages: number;
+  author_ids: number[];
+  language_ids: number[];
+  genre_ids: number[];
+  published_date: string | null;
+  pages: number | null;
+  isbn: string;
+  cover: string | null;
 }
 
 export interface BookQueryParams {

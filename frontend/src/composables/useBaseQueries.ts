@@ -1,16 +1,19 @@
 import type { QueryKey } from "@tanstack/vue-query";
 import { keepPreviousData, useQuery } from "@tanstack/vue-query";
-import { MaybeRefOrGetter, toValue } from "vue";
+import { computed, MaybeRefOrGetter, toValue } from "vue";
 
 export function useListQuery<TData, TParams>(
   queryKey: QueryKey,
   apiFn: (params?: TParams) => Promise<TData>,
   params: MaybeRefOrGetter<TParams>,
+  enabled: MaybeRefOrGetter<boolean> = true,
 ) {
   return useQuery<TData>({
-    queryKey: [...queryKey, params],
+    queryKey: computed(() => [...queryKey, toValue(params)]),
 
     queryFn: () => apiFn(toValue(params)),
+
+    enabled,
 
     placeholderData: keepPreviousData,
 

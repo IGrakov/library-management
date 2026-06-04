@@ -1,14 +1,28 @@
 <script setup lang="ts">
+import Button from "primevue/button";
+import ConfirmDialog from "primevue/confirmdialog";
 import InputText from "primevue/inputtext";
+import { useConfirm } from "primevue/useconfirm";
 import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 
 import BaseDataTable from "@/components/common/BaseDataTable.vue";
 import { useDataTable } from "@/composables/useDataTable";
 import { useDebouncedFilters } from "@/composables/useDebouncedFilters";
+import { useDeleteBook } from "@/queries/books.mutations";
 import { useBooksQuery } from "@/queries/books.queries";
+import { useAuthStore } from "@/stores/auth.store";
+import { Book } from "@/types/books";
 import { ColumnConfig } from "@/types/table";
 
 const { page, rowsPerPage, sortField, sortOrder, onPage, onSort } = useDataTable();
+
+const authStore = useAuthStore();
+const router = useRouter();
+
+const deleteBookMutation = useDeleteBook();
+
+const confirm = useConfirm();
 
 // Filters
 const titleFilter = ref("");
@@ -83,7 +97,46 @@ const columns: ColumnConfig[] = [
   { field: "pages", header: "Pages", align: "right", sortable: false },
   { field: "isbn", header: "ISBN", align: "right" },
   { field: "copiesCount", header: "Number of Copies", align: "right", sortable: false },
+  {
+    field: "actions",
+    header: "",
+    sortable: false,
+    align: "center",
+  },
 ];
+
+function onCreateBook() {
+  router.push("/books/create");
+}
+
+function onEditBook(book: Book) {
+  router.push(`/books/${book.id}/edit`);
+}
+
+function onDeleteBook(id: number) {
+  confirm.require({
+    message: "Are you sure you want to delete this book?",
+
+    header: "Delete Confirmation",
+
+    icon: "pi pi-exclamation-triangle",
+
+    rejectProps: {
+      label: "Cancel",
+      severity: "secondary",
+      outlined: true,
+    },
+
+    acceptProps: {
+      label: "Delete",
+      severity: "danger",
+    },
+
+    accept: async () => {
+      await deleteBookMutation.mutateAsync(id);
+    },
+  });
+}
 </script>
 
 <template>
@@ -95,6 +148,7 @@ const columns: ColumnConfig[] = [
       <InputText v-model="languageFilter" placeholder="Filter by language" class="border rounded p-1" />
       <InputText v-model="genreFilter" placeholder="Filter by genre" class="border rounded p-1" />
       <InputText v-model="isbnFilter" placeholder="Filter by ISBN" class="border rounded p-1" />
+      <Button v-show="authStore.canCreateOrDeleteBook" icon="pi pi-plus" severity="success" @click="onCreateBook" />
     </div>
 
     <BaseDataTable
@@ -107,6 +161,37 @@ const columns: ColumnConfig[] = [
       :sort-order="sortOrder"
       @page="onPage"
       @sort="(event) => onSort(event, apiFieldMap)"
-    />
+    >
+      <template #body-title="{ data }">
+        <Button
+          :label="data.title"
+          text
+          severity="secondary"
+          class="p-0 hover:!bg-transparent hover:underline"
+          @click="router.push(`/books/${data.id}`)"
+        />
+      </template>
+      <template #body-actions="{ data }">
+        <div class="flex gap-2 justify-center">
+          <Button
+            v-show="authStore.canEditBook"
+            icon="pi pi-pencil"
+            severity="info"
+            text
+            rounded
+            @click="onEditBook(data)"
+          />
+          <Button
+            v-show="authStore.canCreateOrDeleteBook"
+            icon="pi pi-trash"
+            severity="danger"
+            text
+            rounded
+            @click="onDeleteBook(data.id)"
+          />
+        </div>
+      </template>
+    </BaseDataTable>
+    <ConfirmDialog />
   </div>
 </template>

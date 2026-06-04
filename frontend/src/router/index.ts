@@ -1,6 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import DefaultLayout from "@/components/layouts/DefaultLayout.vue";
+import AuthorListPage from "@/components/pages/AuthorListPage.vue";
+import BookCreatePage from "@/components/pages/BookCreatePage.vue";
+import BookDetailPage from "@/components/pages/BookDetailPage.vue";
+import BookEditPage from "@/components/pages/BookEditPage.vue";
 import BookListPage from "@/components/pages/BookListPage.vue";
 import GenreListPage from "@/components/pages/GenreListPage.vue";
 import HallListPage from "@/components/pages/HallListPage.vue";
@@ -48,6 +52,33 @@ const router = createRouter({
       },
     },
     {
+      path: "/books/create",
+      name: "book-create",
+      component: BookCreatePage,
+      meta: {
+        breadcrumb: [{ label: "Books", to: "/books" }, { label: "Create" }],
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/books/:id",
+      name: "book-detail",
+      component: BookDetailPage,
+      meta: {
+        breadcrumb: [{ label: "Books", to: "/books" }, { label: "Details" }],
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/books/:id/edit",
+      name: "book-edit",
+      component: BookEditPage,
+      meta: {
+        breadcrumb: [{ label: "Books", to: "/books" }, { label: "Edit" }],
+        requiresAuth: true,
+      },
+    },
+    {
       path: "/halls",
       name: "halls",
       component: HallListPage,
@@ -71,6 +102,15 @@ const router = createRouter({
       component: LanguageListPage,
       meta: {
         breadcrumb: [{ label: "Reference Values" }, { label: "Languages" }],
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/authors",
+      name: "authors",
+      component: AuthorListPage,
+      meta: {
+        breadcrumb: [{ label: "Reference Values" }, { label: "Authors" }],
         requiresAuth: true,
       },
     },

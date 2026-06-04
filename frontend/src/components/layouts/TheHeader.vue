@@ -13,10 +13,6 @@ const router = useRouter();
 
 const authStore = useAuthStore();
 
-const isAuthenticated = computed(() => !!authStore.token);
-
-const userRole = computed(() => authStore.user?.role);
-
 const home = computed<MenuItem>(() => ({
   icon: "pi pi-home",
   command: () => router.push("/"),
@@ -27,7 +23,7 @@ const breadcrumbs = computed<MenuItem[]>(() => {
 });
 
 const menuItems = computed<MenuItem[]>(() => {
-  if (!isAuthenticated.value) {
+  if (!authStore.isAuthenticated) {
     return [];
   }
 
@@ -42,7 +38,7 @@ const menuItems = computed<MenuItem[]>(() => {
     },
   ];
 
-  if (["admin", "librarian"].includes(userRole.value?.toLowerCase() ?? "")) {
+  if (["admin", "librarian"].includes(authStore.role ?? "")) {
     menu.push({
       label: "Users",
       icon: "pi pi-users",
@@ -53,7 +49,7 @@ const menuItems = computed<MenuItem[]>(() => {
     });
   }
 
-  if (["admin", "librarian"].includes(userRole.value?.toLowerCase() ?? "")) {
+  if (["admin", "librarian"].includes(authStore.role ?? "")) {
     menu.push({
       label: "Reference Values",
       icon: "pi pi-list",
@@ -81,6 +77,14 @@ const menuItems = computed<MenuItem[]>(() => {
           class: route.path === "/languages" ? "active-menu-item" : "",
 
           command: () => navigateTo("/languages"),
+        },
+        {
+          label: "Authors",
+          icon: "pi pi-pencil",
+
+          class: route.path === "/authors" ? "active-menu-item" : "",
+
+          command: () => navigateTo("/authors"),
         },
       ],
     });
@@ -112,7 +116,7 @@ function logout() {
             {{ authStore.user.last_name }}
           </span>
 
-          <Button v-if="isAuthenticated" label="Logout" icon="pi pi-sign-out" text @click="logout" />
+          <Button v-if="authStore.isAuthenticated" label="Logout" icon="pi pi-sign-out" text @click="logout" />
 
           <template v-else>
             <Button label="Login" text @click="router.push('/login')" />
