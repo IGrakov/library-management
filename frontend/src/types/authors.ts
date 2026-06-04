@@ -11,8 +11,8 @@ export interface PaginatedAuthors {
 
 export interface CreateAuthorPayload {
   last_name: string;
-  first_name: string;
-  middle_name: string;
+  first_name: string | null;
+  middle_name: string | null;
 }
 
 export type UpdateAuthorPayload = Partial<CreateAuthorPayload>;

@@ -1,8 +1,12 @@
+import { Author } from "@/types/authors";
+import { Genre } from "@/types/genres";
+import { Language } from "@/types/languages";
+
 export interface BaseBook {
   title: string;
-  author: { first_name: string; middle_name: string | null; last_name: string }[];
-  language: { name: string }[];
-  genre: { name: string }[];
+  author: Author[];
+  language: Language[];
+  genre: Genre[];
   published_date: string | null;
   pages: number | null;
   isbn: string;
@@ -35,6 +39,8 @@ export interface CreateBookPayload {
   isbn: string;
   cover: string | null;
 }
+
+export type UpdateBookPayload = Partial<CreateBookPayload>;
 
 export interface BookQueryParams {
   page?: number;

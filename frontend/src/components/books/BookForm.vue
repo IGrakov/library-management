@@ -3,7 +3,7 @@ import AutoComplete from "primevue/autocomplete";
 import InputNumber from "primevue/inputnumber";
 import InputText from "primevue/inputtext";
 import MultiSelect from "primevue/multiselect";
-import { ref, watch } from "vue";
+import { watch } from "vue";
 
 import BaseFormField from "@/components/common/BaseFormField.vue";
 import { AuthorOption } from "@/types/authors";
@@ -41,7 +41,9 @@ const form = defineModel<{
   cover: string | null;
 }>({ required: true });
 
-const selectedAuthors = ref<AuthorOption[]>([]);
+const selectedAuthors = defineModel<AuthorOption[]>("selectedAuthors", {
+  required: true,
+});
 
 function handleAuthorSearch(event: { query: string }) {
   props.onAuthorSearch(event?.query ?? "");

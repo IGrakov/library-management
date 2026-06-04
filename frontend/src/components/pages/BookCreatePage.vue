@@ -11,6 +11,7 @@ import { useAuthorsLookupQuery } from "@/queries/authors.queries";
 import { useCreateBook } from "@/queries/books.mutations";
 import { useGenresQuery } from "@/queries/genres.queries";
 import { useLanguagesQuery } from "@/queries/languages.queries";
+import { AuthorOption } from "@/types/authors";
 import { CreateBookPayload } from "@/types/books";
 
 const router = useRouter();
@@ -72,6 +73,8 @@ const bookForm = reactive<CreateBookPayload>({
   cover: null,
 });
 
+const selectedAuthors = ref<AuthorOption[]>([]);
+
 async function onSubmit() {
   clearErrors();
 
@@ -94,6 +97,7 @@ async function onSubmit() {
     <div class="card p-4 w-lg">
       <BookForm
         v-model="bookForm"
+        v-model:selected-authors="selectedAuthors"
         :authors-suggestions="authorsSuggestions"
         :on-author-search="onAuthorSearch"
         :languages="languages"

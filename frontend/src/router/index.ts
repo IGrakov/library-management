@@ -21,7 +21,7 @@ const router = createRouter({
       name: "login",
       component: LoginPage,
       meta: {
-        breadcrumb: [{ label: "Register" }],
+        breadcrumb: [{ label: "Login" }],
       },
     },
     {
