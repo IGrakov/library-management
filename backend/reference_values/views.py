@@ -1,8 +1,10 @@
+from django.db.models import QuerySet, Q
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics
-from rest_framework.filters import OrderingFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
 
+from core.constants import MAX_NUM_OF_ITEMS_IN_LOOKUP
 from core.pagination import ResultSetPagination
 from reference_values.filters import GenreFilter, HallFilter, LanguageFilter, AuthorFilter
 from reference_values.models import Author, Genre, Hall, Language
@@ -252,3 +254,26 @@ class ListAuthorView(generics.ListAPIView):
     )
 
     order = "last_name"
+
+
+@extend_schema(
+    tags=["author"],
+)
+class AuthorLookupView(generics.ListAPIView):
+    """Lookup for authors"""
+
+    serializer_class = AuthorSerializer
+    def get_queryset(self):
+        search = self.request.query_params.get("search")
+
+        if not search:
+            return Author.objects.none()
+
+        return (
+            Author.objects.filter(
+                Q(last_name__icontains=search)
+                | Q(first_name__icontains=search)
+                | Q(middle_name__icontains=search)
+            )
+            .order_by("last_name")[:MAX_NUM_OF_ITEMS_IN_LOOKUP]
+        )

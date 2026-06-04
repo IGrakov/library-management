@@ -32,15 +32,15 @@ class BookSerializer(serializers.ModelSerializer):
 
 
 class BookWriteSerializer(serializers.ModelSerializer):
-    author = serializers.ListField(child=serializers.IntegerField(), write_only=True, required=False)
-    language = serializers.ListField(child=serializers.IntegerField(), write_only=True, required=False)
-    genre = serializers.ListField(child=serializers.IntegerField(), write_only=True, required=False)
+    author_ids = serializers.ListField(child=serializers.IntegerField(), write_only=True, required=False)
+    language_ids = serializers.ListField(child=serializers.IntegerField(), write_only=True, required=False)
+    genre_ids = serializers.ListField(child=serializers.IntegerField(), write_only=True, required=False)
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         book_attrs = {**attrs}
-        book_attrs.pop("author", [])
-        book_attrs.pop("language", [])
-        book_attrs.pop("genre", [])
+        book_attrs.pop("author_ids", [])
+        book_attrs.pop("language_ids", [])
+        book_attrs.pop("genre_ids", [])
 
         return attrs
 
@@ -70,9 +70,9 @@ class BookWriteSerializer(serializers.ModelSerializer):
 
     @atomic
     def create(self, validated_data: dict[str, Any]) -> Book:
-        author_ids = validated_data.pop("author", [])
-        language_ids = validated_data.pop("language", [])
-        genre_ids = validated_data.pop("genre", [])
+        author_ids = validated_data.pop("author_ids", [])
+        language_ids = validated_data.pop("language_ids", [])
+        genre_ids = validated_data.pop("genre_ids", [])
 
         book = Book.objects.create(**validated_data)
 
@@ -82,20 +82,20 @@ class BookWriteSerializer(serializers.ModelSerializer):
 
     @atomic
     def update(self, instance: Book, validated_data: dict[str, Any]) -> Book:
-        author_ids = validated_data.pop("author", [])
-        language_ids = validated_data.pop("language", [])
-        genre_ids = validated_data.pop("genre", [])
+        author_ids = validated_data.pop("author_ids", [])
+        language_ids = validated_data.pop("language_ids", [])
+        genre_ids = validated_data.pop("genre_ids", [])
 
         instance = super().update(instance, validated_data)
 
         # Do not remove author references in case that payload for partial update does not contain any authors
-        if author_ids is not None:
+        if author_ids:
             instance.author.remove(*instance.author.all())
         # Do not remove language references in case that payload for partial update does not contain any languages
-        if language_ids is not None:
+        if language_ids:
             instance.language.remove(*instance.language.all())
         # Do not remove genre references in case that payload for partial update does not contain any genres
-        if genre_ids is not None:
+        if genre_ids:
             instance.genre.remove(*instance.genre.all())
 
         self.add_authors_languages_genres(instance, author_ids, language_ids, genre_ids)
@@ -111,13 +111,13 @@ class BookWriteSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "title",
-            "author",
+            "author_ids",
             "published_date",
             "isbn",
             "pages",
             "cover",
-            "language",
-            "genre",
+            "language_ids",
+            "genre_ids",
         )
 
 

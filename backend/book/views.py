@@ -29,7 +29,7 @@ class CreateBookView(generics.CreateAPIView):
     """Create new book"""
 
     permission_classes = (IsAdminOrReadOnly,)
-    serializer_class = BookSerializer
+    serializer_class = BookWriteSerializer
     queryset = Book.objects.all()
 
 
