@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { isAxiosError } from "axios";
 import Button from "primevue/button";
-import { computed, reactive, ref, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import BookForm from "@/components/books/BookForm.vue";
 import DefaultLayout from "@/components/layouts/DefaultLayout.vue";
+import { useBookFormLookups } from "@/composables/useBookFormLookups";
 import { useForm } from "@/composables/useForm";
-import { useAuthorsLookupQuery } from "@/queries/authors.queries";
 import { useUpdateBook } from "@/queries/books.mutations";
 import { useBookQuery } from "@/queries/books.queries";
-import { useGenresQuery } from "@/queries/genres.queries";
-import { useLanguagesQuery } from "@/queries/languages.queries";
 import { AuthorOption } from "@/types/authors";
 import { CreateBookPayload } from "@/types/books";
 
@@ -22,47 +20,7 @@ const updateBookMutation = useUpdateBook();
 
 const { fieldErrors, generalError, clearErrors, setBackendErrors } = useForm();
 
-const languagesQuery = useLanguagesQuery({
-  page_size: 1000,
-});
-
-const genresQuery = useGenresQuery({
-  page_size: 1000,
-});
-
-const authorSearch = ref("");
-
-const authorsLookupQuery = useAuthorsLookupQuery(
-  computed(() => ({
-    search: authorSearch.value,
-  })),
-  computed(() => authorSearch.value.trim().length >= 2),
-);
-
-function onAuthorSearch(query: string) {
-  authorSearch.value = query;
-}
-
-const authorsSuggestions = computed(() =>
-  (authorsLookupQuery.data.value ?? []).map((a) => ({
-    id: a.id,
-    full_name: [a.last_name, a.first_name, a.middle_name].filter(Boolean).join(" "),
-  })),
-);
-
-const languages = computed(() =>
-  (languagesQuery.data.value?.results ?? []).map((language) => ({
-    id: language.id,
-    name: language.name,
-  })),
-);
-
-const genres = computed(() =>
-  (genresQuery.data.value?.results ?? []).map((genre) => ({
-    id: genre.id,
-    name: genre.name,
-  })),
-);
+const { authorsSuggestions, languages, genres, onAuthorSearch } = useBookFormLookups();
 
 const bookId = Number(route.params.id);
 
