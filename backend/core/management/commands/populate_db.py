@@ -214,11 +214,14 @@ class Command(BaseCommand):
 
         book_copy_choices = [1, 1, 1, 1, 2, 2, 2, 3, 4]
 
+        hall_ids = Hall.objects.values_list("id", flat=True)
+
         for book in books:
             num_of_copies = random.choice(book_copy_choices)  # noqa: S311
             book_copies = []
             for _ in range(num_of_copies):
-                book_copies.append(BookCopy(book=book, uid=fake.uuid4()))
+                hall_id = random.choice(hall_ids)
+                book_copies.append(BookCopy(book=book, hall_id=hall_id, uid=fake.uuid4()))
             BookCopy.objects.bulk_create(book_copies)
 
         self.stdout.write(self.style.SUCCESS("Successfully created book copies"))
