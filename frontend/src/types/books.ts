@@ -1,4 +1,5 @@
 import { Author } from "@/types/authors";
+import { BookCopy } from "@/types/bookCopies";
 import { Genre } from "@/types/genres";
 import { Language } from "@/types/languages";
 
@@ -20,6 +21,7 @@ export interface Book extends BaseBook {
 export interface DetailedBook extends BaseBook {
   id: number;
   cover: string | null;
+  copies: BookCopy[];
 }
 
 export interface PaginatedBooks {
