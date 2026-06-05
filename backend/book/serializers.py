@@ -4,8 +4,8 @@ from django.db.transaction import atomic
 from rest_framework import serializers
 
 from book.models import Book, BookCopy
-from reference_values.models import Author, Genre, Language
-from reference_values.serializers import AuthorSerializer, GenreSerializer, LanguageSerializer
+from reference_values.models import Author, Genre, Hall, Language
+from reference_values.serializers import AuthorSerializer, GenreSerializer, HallSerializer, LanguageSerializer
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -45,6 +45,30 @@ class BookSerializer(serializers.ModelSerializer):
             "genre",
             "copies_count",
         )
+
+
+class BookCopyNestedSerializer(serializers.ModelSerializer):
+    hall = HallSerializer(read_only=True)
+
+    class Meta:
+        model = BookCopy
+        fields = (
+            "id",
+            "uid",
+            "hall",
+        )
+
+
+class BookDetailSerializer(BookSerializer):
+    copies = BookCopyNestedSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    class Meta(BookSerializer.Meta):
+        model = Book
+
+        fields = BookSerializer.Meta.fields + ("copies",)
 
 
 class BookWriteSerializer(serializers.ModelSerializer):
@@ -137,21 +161,36 @@ class BookWriteSerializer(serializers.ModelSerializer):
         )
 
 
-class BookCopySerializer(serializers.ModelSerializer):
+class BookCopyListSerializer(serializers.ModelSerializer):
     book = BookSerializer(read_only=True)
+    hall = HallSerializer(read_only=True)
 
+    class Meta:
+        model = BookCopy
+        fields = (
+            "id",
+            "uid",
+            "book",
+            "hall",
+        )
+
+
+class BookCopyWriteSerializer(serializers.ModelSerializer):
     book_id = serializers.PrimaryKeyRelatedField(
         queryset=Book.objects.all(),
         source="book",
-        write_only=True,
+    )
+
+    hall_id = serializers.PrimaryKeyRelatedField(
+        queryset=Hall.objects.all(),
+        source="hall",
+        allow_null=True,
+        required=False,
     )
 
     class Meta:
         model = BookCopy
-
         fields = (
-            "id",
-            "book",
             "book_id",
-            "uid",
+            "hall_id",
         )

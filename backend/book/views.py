@@ -9,7 +9,9 @@ from rest_framework.permissions import AllowAny
 from book.filters import BookFilter
 from book.models import Book, BookCopy
 from book.serializers import (
-    BookCopySerializer,
+    BookCopyListSerializer,
+    BookCopyWriteSerializer,
+    BookDetailSerializer,
     BookSerializer,
     BookWriteSerializer,
 )
@@ -51,12 +53,24 @@ class RetrieveUpdateDeleteBookView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete book by id"""
 
     permission_classes = (IsAdminOrReadOnly,)
-    queryset = Book.objects.all()
+
+    def get_queryset(self):
+        serializer_class = self.get_serializer_class()
+
+        if serializer_class is BookDetailSerializer:
+            return Book.objects.prefetch_related(
+                "copies",
+                "copies__hall",
+            )
+
+        return Book.objects.all()
 
     def get_serializer_class(self):
         if self.request.method in ["PUT", "PATCH"]:
             return BookWriteSerializer
-        return BookSerializer
+        if self.request.method in ["DELETE"]:
+            return BookSerializer
+        return BookDetailSerializer
 
 
 @extend_schema_view(
@@ -114,7 +128,7 @@ class CreateBookCopyView(generics.CreateAPIView):
     """Create new book copy"""
 
     permission_classes = (IsAdminOrReadOnly,)
-    serializer_class = BookCopySerializer
+    serializer_class = BookCopyWriteSerializer
     queryset = BookCopy.objects.all()
 
 
@@ -133,7 +147,7 @@ class RetrieveDeleteBookCopyView(generics.RetrieveDestroyAPIView):
     """Retrieve, update or delete book copy by id"""
 
     permission_classes = (IsAdminOrReadOnly,)
-    serializer_class = BookCopySerializer
+    serializer_class = BookCopyWriteSerializer
     queryset = BookCopy.objects.all()
 
 
@@ -143,6 +157,6 @@ class RetrieveDeleteBookCopyView(generics.RetrieveDestroyAPIView):
 class ListBookCopyView(generics.ListAPIView):
     """List book copies"""
 
-    serializer_class = BookCopySerializer
+    serializer_class = BookCopyListSerializer
     queryset = BookCopy.objects.select_related("book").prefetch_related("book__author", "book__language", "book__genre")
     pagination_class = ResultSetPagination

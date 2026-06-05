@@ -44,11 +44,7 @@ class BookCopy(TimeStampMixin):
 
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="copies")
     uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    hall = models.ForeignKey(Hall, on_delete=models.SET_NULL, null=True, blank=True)
-
-    @property
-    def is_available(self) -> bool:
-        return not self.book_loans.filter(returned_at__isnull=True).exists()
+    hall = models.ForeignKey(Hall, on_delete=models.SET_NULL, null=True, blank=True, related_name="copies")
 
     def __str__(self) -> str:
         return f"Copy of book with ISBN {self.book.isbn} with uid {self.uid}"
