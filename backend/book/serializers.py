@@ -9,10 +9,26 @@ from reference_values.serializers import AuthorSerializer, GenreSerializer, Lang
 
 
 class BookSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer(many=True, read_only=True)
-    language = LanguageSerializer(many=True, read_only=True)
-    genre = GenreSerializer(many=True, read_only=True)
+    author = serializers.SerializerMethodField()
+    language = serializers.SerializerMethodField()
+    genre = serializers.SerializerMethodField()
     copies_count = serializers.IntegerField(read_only=True)
+
+    def get_author(self, obj):
+        authors = obj.author.order_by(
+            "last_name",
+            "first_name",
+            "middle_name",
+        )
+        return AuthorSerializer(authors, many=True).data
+
+    def get_language(self, obj):
+        languages = obj.language.order_by("name")
+        return LanguageSerializer(languages, many=True).data
+
+    def get_genre(self, obj):
+        genres = obj.genre.order_by("name")
+        return GenreSerializer(genres, many=True).data
 
     class Meta:
         model = Book
